@@ -1,0 +1,24 @@
+{
+    "name": "smadeira/ministry-platform-api",
+    "description": "PHP API wrapper for the Ministry Platform REST API",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Scott Madeira",
+            "email": "smadeira@zoominternet.net"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0",
+        "guzzlehttp/guzzle": "~6.0",
+        "illuminate/cache": "4.x",
+        "illuminate/filesystem": "4.x",
+        "vlucas/phpdotenv": "^2.4"
+    },
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-0": {
+            "MinistryPlatforAPI": "src/"
+        }
+    }
+}
