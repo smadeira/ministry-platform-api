@@ -407,7 +407,7 @@ class MinistryPlatformAPI
             CURLOPT_POST => 0,
             CURLOPT_HEADER => 0,
             CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_VERBOSE => true,
+            CURLOPT_VERBOSE => false,
             CURLOPT_RETURNTRANSFER => true
         ];
 
