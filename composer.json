@@ -2,6 +2,7 @@
     "name": "smadeira/ministry-platform-api",
     "description": "PHP API wrapper for the Ministry Platform REST API",
     "type": "library",
+    "license": "MIT",
     "authors": [
         {
             "name": "Scott Madeira",
