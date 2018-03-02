@@ -57,9 +57,7 @@ class MinistryPlatformAPI
     {
         $this->initialize();
     }
-
-
-
+    
     /**
      * Set the table for the GET request
      *
