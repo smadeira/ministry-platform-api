@@ -21,6 +21,5 @@
         "psr-4": {
             "MinistryPlatformAPI\\": "src/"
         }
-    },
-    "version": "0.1.0"
+    }
 }
