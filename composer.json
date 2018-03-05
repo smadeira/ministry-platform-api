@@ -16,7 +16,7 @@
         "illuminate/filesystem": "4.x",
         "vlucas/phpdotenv": "^2.4"
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "dev",    
     "autoload": {
         "psr-4": {
             "MinistryPlatformAPI\\": "src/"
