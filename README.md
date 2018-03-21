@@ -1,7 +1,4 @@
 ## Ministry Platform API Wrapper
-[![License](https://poser.pugx.org/smadeira/ministry-platform-api/license)](https://packagist.org/packages/smadeira/ministry-platform-api)
-[![Latest Stable Version](https://poser.pugx.org/smadeira/ministry-platform-api/v/stable)](https://packagist.org/packages/smadeira/ministry-platform-api)
-[![Total Downloads](https://poser.pugx.org/smadeira/ministry-platform-api/downloads)](https://packagist.org/packages/smadeira/ministry-platform-api)
 
 
 ### Note for v2: This API wrapper has been updated to work with the new Ministry Platform oAuth changes (Spring 2018)
