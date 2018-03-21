@@ -31,7 +31,6 @@ class MinistryPlatformAPI
     private $jwks_uri = null;
     private $scopes_supported = null;
 
-
     private $apiEndpoint = null;
     private $headers;
 
