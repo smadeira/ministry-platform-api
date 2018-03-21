@@ -47,7 +47,7 @@ The update command will download all the dependencies (including the API wrapper
 start development.
 
 Mote: It's a good idea to run "composer update" every so often to download the latest version of the API wrapper and all of its dependencies.  That's the 
-beauty of Composer.  It manages all of that for you so you don't have to.
+beauty of Composer. It manages all of that for you so you don't have to.
 
 ## Configuration
 There are a few things that need to be done to configure the API wrapper to function in your environment.
