@@ -38,7 +38,7 @@ After including the API Wrapper with composer, do a composer update to download 
 API wrapper to function.
 
 ```
-compuser update
+composer update
 ```
 The update command will download all the dependencies (including the API wrapper code) to the vendor diretory.  Once this is done, you are ready to 
 start development.
@@ -175,6 +175,3 @@ returning the results of a GET all in one operation.
 ## Still to be Done
 As of now the wrapper only handles GET,POST and PUT to the tables because that is all I've needed.  DELETE is not implemented almost on purpose to 
 prevent me from doing something silly. If there is a need, it can be implemented fairly easily.
-
-Results Limit - As of now, the GET will only retrieve the first 1000 records of a query result.  This will be updated soon to get all of the results. It
-is a limitation/feature of the MP REST API implementation.

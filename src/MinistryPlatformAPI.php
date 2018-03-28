@@ -16,6 +16,7 @@ class MinistryPlatformAPI
     public $select = '*';
     public $filter = null;
     public $orderby = null;
+    public $skip = 0;
 
     // Row data for update requests
     public $records = null;
@@ -118,32 +119,60 @@ class MinistryPlatformAPI
         $endpoint = $this->buildEndpoint();
 
         // Set the header
-        $auth = 'Authorization: ' . $this->token_type . ' ' . $this->access_token;
-        $scope = 'Scope: ' . $this->scope;
-        $this->headers = ['Accept: application/json', 'Content-type: application/json', $auth, $scope];
+        $this->buildHttpHeader();
+
+        // Get all of the results 1000 at a time
+        return  $this->getResults($endpoint);
+
+    }
+
+    /**
+     * Request data 1000 rows at a time until all data has been retrieved
+     * The JSON API returns a max of 1000 records per request.  Use 
+     * the $skip to move the results window 1000 records at a time.
+     * 
+     */
+    private function getResults($endpoint)
+    {
+        $results = [];
 
         // Send the request
         $client = new Client(); //GuzzleHttp\Client
 
-        try {
-            $response = $client->request('GET', $endpoint, [
-                'headers' => $this->headers,
-                'query' => ['$select' => $this->select,
-                    '$filter' => $this->filter,
-                    '$orderby' => $this->orderby],
-                'curl' => $this->setGetCurlopts(),
-            ]);
+        do {
+            try {
+                $response = $client->request('GET', $endpoint, [
+                    'headers' => $this->headers,
+                    'query' => ['$select' => $this->select,
+                        '$filter' => $this->filter,
+                        '$orderby' => $this->orderby,
+                        '$skip' => $this->skip],
+                    'curl' => $this->setGetCurlopts(),
+                ]);
 
-        } catch (GuzzleException $e) {
-            print_r($e->getResponse()->getBody()->getContents());
-            return false;
+            } catch (GuzzleException $e) {
+                print_r($e->getResponse()->getBody()->getContents());
+                return false;
 
-        } catch (GuzzleHttp\Exception\ClientException $e) {
-            echo $e->getResponse()->getBody()->getContents();
-            return false;
-        }
+            } catch (GuzzleHttp\Exception\ClientException $e) {
+                echo $e->getResponse()->getBody()->getContents();
+                return false;
+            }
 
-        return $results = json_decode($response->getBody(), true);
+            $r = json_decode($response->getBody(), true);
+            
+            // Get the number of rows returned
+            $num = count($r);
+
+            // Add this result set to the previous results
+            $results = array_merge($results, $r);
+
+            // Skip the rows we just got back
+            $this->skip += 1000;
+
+        } while ( $num > 0 );
+
+        return $results;
     }
 
     /**
@@ -183,9 +212,7 @@ class MinistryPlatformAPI
         $endpoint = $this->buildEndpoint();
 
         // Set the header
-        $auth = 'Authorization: ' . $this->token_type . ' ' . $this->access_token;
-        $scope = 'Scope: ' . $this->scope;
-        $this->headers = ['Accept: application/json', 'Content-type: application/json', $auth, $scope];
+        $this->buildHttpHeader();
 
         // Send the request
         $client = new Client(); //GuzzleHttp\Client
@@ -211,13 +238,9 @@ class MinistryPlatformAPI
         }
 
         return $results = json_decode($response->getBody(), true);
-
-
-
     }
 
-
-   
+  
     /**
      * Construct the API Endpoint for the request
      *
@@ -228,6 +251,14 @@ class MinistryPlatformAPI
         return $this->apiEndpoint . '/tables/' . $this->tableName . '/';
     }
    
+    private function buildHttpHeader()
+    {
+        // Set the header
+        $auth = 'Authorization: ' . $this->token_type . ' ' . $this->access_token;
+        $scope = 'Scope: ' . $this->scope;
+        $this->headers = ['Accept: application/json', 'Content-type: application/json', $auth, $scope];
+
+    }
 
     /**
      * Set the cUrl Options for a get request
@@ -269,4 +300,3 @@ class MinistryPlatformAPI
         return $curlopts;
     }  
 }
-
