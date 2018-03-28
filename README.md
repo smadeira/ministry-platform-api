@@ -28,8 +28,8 @@ composer require smadeira/ministry-platform-api
 Or, you can edit your composer.json file directly to add the Ministry Platform API:
 ```
 "require": {
-        "php": ">=5.6.0",
-        "smadeira/ministry-platform-api": "*"
+        "php": ">=7.0.0",
+        "smadeira/ministry-platform-api": "^2.0.0"
     },
 ```
 
