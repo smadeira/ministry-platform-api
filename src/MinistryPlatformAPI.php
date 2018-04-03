@@ -167,10 +167,10 @@ class MinistryPlatformAPI
             // Add this result set to the previous results
             $results = array_merge($results, $r);
 
-            // Skip the rows we just got back
-            $this->skip += 1000;
+            // Skip the rows we just got back if there were 1000 of them and query again
+            ($num == 1000)? $this->skip += 1000 : $this->skip = 0;
 
-        } while ( $num > 0 );
+        } while ( $this->skip > 0 );
 
         return $results;
     }
