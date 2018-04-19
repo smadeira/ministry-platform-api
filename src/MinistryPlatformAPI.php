@@ -12,16 +12,28 @@ class MinistryPlatformAPI
      *
      * @var null
      */
-    public $tableName = null;
-    public $select = '*';
-    public $filter = null;
-    public $orderby = null;
-    public $skip = 0;
+    protected $tableName = null;
+    protected $select = '*';
+    protected $filter = null;
+    protected $orderby = null;
+    protected $skip = 0;
 
     // Row data for update requests
-    public $records = null;
+    protected $records = null;
 
-    
+
+    /**
+     *  parameters for calling procedures
+     *
+     */
+    protected $procName = null;
+    protected $procInput = null;
+
+
+    /**
+     * Stuff needed to execute the request
+     *
+     */
     private $apiEndpoint = null;
     private $headers;
 
@@ -150,12 +162,12 @@ class MinistryPlatformAPI
                     'curl' => $this->setGetCurlopts(),
                 ]);
 
-            } catch (GuzzleException $e) {
+            } catch (\GuzzleException $e) {
                 print_r($e->getResponse()->getBody()->getContents());
                 return false;
 
-            } catch (GuzzleHttp\Exception\ClientException $e) {
-                echo $e->getResponse()->getBody()->getContents();
+            } catch (\GuzzleHttp\Exception\ClientException $e) {
+                print_r( $e->getResponse()->getBody()->getContents() );
                 return false;
             }
 
