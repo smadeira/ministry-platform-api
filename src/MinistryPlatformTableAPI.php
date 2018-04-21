@@ -3,7 +3,7 @@
 use GuzzleHttp\Client;
 use MinistryPlatformAPI\MPoAuth;
 
-class MinistryPlatformAPI
+class MinistryPlatformTableAPI
 {
     use MPoAuth;
 

@@ -3,10 +3,9 @@
 use GuzzleHttp\Client;
 use MinistryPlatformAPI\MPoAuth;
 
-class MinistryPlatformAPI_Procs
+class MinistryPlatformProcAPI
 {
     use MPoAuth;
-
     
     /**
      *  parameters for calling procedures
@@ -15,7 +14,6 @@ class MinistryPlatformAPI_Procs
     protected $procName = null;
     protected $procInput = null;
 
-
     /**
      * Stuff needed to execute the request
      *
@@ -23,7 +21,6 @@ class MinistryPlatformAPI_Procs
     private $apiEndpoint = null;
     private $headers;
 
-    
     /**
      * Set basic variables.
      *
@@ -54,7 +51,6 @@ class MinistryPlatformAPI_Procs
         return $this;
     }
 
-
     /**
      * Execute the stored procedure
      *
@@ -63,7 +59,7 @@ class MinistryPlatformAPI_Procs
     public function exec()
     {
         // Set the endpoint
-        $endpoint = $this->buildEndpoint();
+        // $this->buildEndpoint();
 
         // Set the header
         $this->buildHttpHeader();
@@ -73,8 +69,12 @@ class MinistryPlatformAPI_Procs
 
     }
 
-        
-    
+    /**
+     * Send the request
+     *
+     * @return bool|mixed
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
     private function sendData() {
 
         // Set the endpoint
@@ -82,10 +82,6 @@ class MinistryPlatformAPI_Procs
 
         // Set the header
         $this->buildHttpHeader();
-
-
-        // echo $this->procInput; die();
-
 
         // Send the request
         $client = new Client(); //GuzzleHttp\Client
