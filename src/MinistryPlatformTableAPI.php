@@ -173,6 +173,13 @@ class MinistryPlatformTableAPI
             } catch (\GuzzleHttp\Exception\ClientException $e) {
                 $this->errorMessage = $e->getResponse()->getBody()->getContents();
                 return false;
+            } catch (\GuzzleHttp\Exception\ServerException $e) {
+                $this->errorMessage = $e->getResponse()->getBody()->getContents();
+                return false;
+            
+            } catch (Exception $e) {
+                $this->errorMessage = 'Unknown Excpetion in Guzzle request';
+                return false;
             }
 
             $r = json_decode($response->getBody(), true);
@@ -244,12 +251,20 @@ class MinistryPlatformTableAPI
                 'curl' => $this->setPutCurlopts(),
             ]);
 
-        } catch (GuzzleException $e) {
+        } catch (\GuzzleException $e) {
             $this->errorMessage = $e->getResponse()->getBody()->getContents();
             return false;
 
-        } catch (GuzzleHttp\Exception\ClientException $e) {
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
             $this->errorMessage = $e->getResponse()->getBody()->getContents();
+            return false;
+
+        }  catch (\GuzzleHttp\Exception\ServerException $e) {
+            $this->errorMessage = $e->getResponse()->getBody()->getContents();
+            return false;
+        
+        } catch (Exception $e) {
+            $this->errorMessage = 'Unknown Excpetion in Guzzle request';
             return false;
         }
 

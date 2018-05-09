@@ -105,7 +105,16 @@ class MinistryPlatformProcAPI
         } catch (\GuzzleHttp\Exception\ClientException $e) {
             $this->errorMessage = $e->getResponse()->getBody()->getContents();
             return false;
+        
+        }  catch (\GuzzleHttp\Exception\ServerException $e) {
+            $this->errorMessage = $e->getResponse()->getBody()->getContents();
+            return false;
+        
+        } catch (Exception $e) {
+            $this->errorMessage = 'Unknown Excpetion in Guzzle request';
+            return false;
         }
+
 
         return $results = json_decode($response->getBody(), true);
     }
