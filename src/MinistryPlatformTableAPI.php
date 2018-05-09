@@ -37,6 +37,8 @@ class MinistryPlatformTableAPI
     private $apiEndpoint = null;
     private $headers;
 
+    private errorMessage = null;
+
     
     /**
      * Set basic variables.
@@ -148,6 +150,8 @@ class MinistryPlatformTableAPI
     {
         $results = [];
 
+        $this->errorMessage = null;
+
         // Send the request
         $client = new Client(); //GuzzleHttp\Client
 
@@ -163,11 +167,11 @@ class MinistryPlatformTableAPI
                 ]);
 
             } catch (\GuzzleException $e) {
-                print_r($e->getResponse()->getBody()->getContents());
+                $this->errorMessage = $e->getResponse()->getBody()->getContents();
                 return false;
 
             } catch (\GuzzleHttp\Exception\ClientException $e) {
-                print_r( $e->getResponse()->getBody()->getContents() );
+                $this->errorMessage = $e->getResponse()->getBody()->getContents();
                 return false;
             }
 
@@ -241,11 +245,11 @@ class MinistryPlatformTableAPI
             ]);
 
         } catch (GuzzleException $e) {
-            print_r($e->getResponse()->getBody()->getContents());
+            $this->errorMessage = $e->getResponse()->getBody()->getContents();
             return false;
 
         } catch (GuzzleHttp\Exception\ClientException $e) {
-            echo $e->getResponse()->getBody()->getContents();
+            $this->errorMessage = $e->getResponse()->getBody()->getContents();
             return false;
         }
 
@@ -311,4 +315,12 @@ class MinistryPlatformTableAPI
 
         return $curlopts;
     }  
+
+    /**
+     * Return a Guzzle error message
+     */
+    public function errorMessage()
+    {
+        return $this->errorMessage;
+    }
 }
