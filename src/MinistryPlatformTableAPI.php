@@ -37,7 +37,7 @@ class MinistryPlatformTableAPI
     private $apiEndpoint = null;
     private $headers;
 
-    private errorMessage = null;
+    private $errorMessage = null;
 
     
     /**
