@@ -18,17 +18,10 @@ class MinistryPlatformTableAPI
     protected $orderby = null;
     protected $skip = 0;
 
+    protected $recordID = null;
+
     // Row data for update requests
     protected $records = null;
-
-
-    /**
-     *  parameters for calling procedures
-     *
-     */
-    protected $procName = null;
-    protected $procInput = null;
-
 
     /**
      * Stuff needed to execute the request
@@ -38,7 +31,6 @@ class MinistryPlatformTableAPI
     private $headers;
 
     private $errorMessage = null;
-
     
     /**
      * Set basic variables.
@@ -149,7 +141,6 @@ class MinistryPlatformTableAPI
     private function getResults($endpoint)
     {
         $results = [];
-
         $this->errorMessage = null;
 
         // Send the request
@@ -176,10 +167,6 @@ class MinistryPlatformTableAPI
             } catch (\GuzzleHttp\Exception\ServerException $e) {
                 $this->errorMessage = $e->getResponse()->getBody()->getContents();
                 return false;
-            
-            } catch (Exception $e) {
-                $this->errorMessage = 'Unknown Excpetion in Guzzle request';
-                return false;
             }
 
             $r = json_decode($response->getBody(), true);
@@ -195,6 +182,7 @@ class MinistryPlatformTableAPI
 
         } while ( $this->skip > 0 );
 
+        $this->reset();
         return $results;
     }
 
@@ -206,6 +194,7 @@ class MinistryPlatformTableAPI
     public function first()
     {
         if ($results = $this->get()) {
+            $this->reset();
             return $results[0];
         }
 
@@ -218,14 +207,60 @@ class MinistryPlatformTableAPI
      */
     public function put()
     {
-        return $this->sendData('PUT');
-        
+        $r =  $this->sendData('PUT');
+        $this->reset();
+
+        return $r;
     }
 
     // POST a new record to the database
     public function post()
     {
-        return $this->sendData('POST');
+        $r =  $this->sendData('POST');
+        $this->reset();
+
+        return $r;
+    }
+
+    /**
+     * Delete a record with the supplied ID
+     *
+     */
+    public function delete($id)
+    {
+        // Set the endpoint
+        $endpoint = $this->buildEndpoint();
+
+        $endpoint .= '/' . $id;
+
+
+        // Set the header
+        $this->buildHttpHeader();
+
+        // Send the request
+        $client = new Client(); //GuzzleHttp\Client
+
+        try {
+
+            $response = $client->request('DELETE', $endpoint, [
+                'headers' => $this->headers,                
+                'curl' => $this->setGetCurlopts(),
+            ]);
+
+        } catch (\GuzzleException $e) {
+            $this->errorMessage = $e->getResponse()->getBody()->getContents();
+            return false;
+
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            $this->errorMessage = $e->getResponse()->getBody()->getContents();
+            return false;
+        } catch (\GuzzleHttp\Exception\ServerException $e) {
+            $this->errorMessage = $e->getResponse()->getBody()->getContents();
+            return false;
+        }
+
+        return $results = json_decode($response->getBody(), true);
+
     }
 
 
@@ -258,13 +293,8 @@ class MinistryPlatformTableAPI
         } catch (\GuzzleHttp\Exception\ClientException $e) {
             $this->errorMessage = $e->getResponse()->getBody()->getContents();
             return false;
-
-        }  catch (\GuzzleHttp\Exception\ServerException $e) {
+        } catch (\GuzzleHttp\Exception\ServerException $e) {
             $this->errorMessage = $e->getResponse()->getBody()->getContents();
-            return false;
-        
-        } catch (Exception $e) {
-            $this->errorMessage = 'Unknown Excpetion in Guzzle request';
             return false;
         }
 
@@ -288,6 +318,22 @@ class MinistryPlatformTableAPI
         $auth = 'Authorization: ' . $this->token_type . ' ' . $this->access_token;
         $scope = 'Scope: ' . $this->scope;
         $this->headers = ['Accept: application/json', 'Content-type: application/json', $auth, $scope];
+
+    }
+
+    /**
+     * Reset query parameters
+     */
+    private function reset()
+    {
+        $this->tableName = null;
+        $this->select = '*';
+        $this->filter = null;
+        $this->orderby = null;
+        $this->skip = 0;
+        $this->recordID = null;
+
+        $this->records = null;
 
     }
 
@@ -329,10 +375,12 @@ class MinistryPlatformTableAPI
         ];
 
         return $curlopts;
-    }  
+    }
 
     /**
-     * Return a Guzzle error message
+     * Return the error message from the request
+     *
+     * @return null
      */
     public function errorMessage()
     {
