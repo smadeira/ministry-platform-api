@@ -16,6 +16,10 @@ class MinistryPlatformTableAPI
     protected $select = '*';
     protected $filter = null;
     protected $orderby = null;
+    protected $groupby = null;
+    protected $having = null;
+    protected $top = null;
+    protected $distinct = null;
     protected $skip = 0;
 
     protected $recordID = null;
@@ -31,7 +35,7 @@ class MinistryPlatformTableAPI
     private $headers;
 
     private $errorMessage = null;
-    
+
     /**
      * Set basic variables.
      *
@@ -102,6 +106,47 @@ class MinistryPlatformTableAPI
     }
 
     /**
+     * Set the Group By clause for the GET request
+     * @param $groupby
+     * @return $this
+     */
+    public function groupBy($groupby)
+    {
+        $this->groupby = $groupby;
+
+        return $this;
+    }
+
+    /**
+     * Set the Having caluse for the GET request
+     * @param $having
+     * @return $this
+     */
+    public function having($having)
+    {
+        $this->having = $having;
+
+        return $this;
+    }
+
+    /**
+     * Set the Top parameter for the GET Request
+     * @param $top | integer
+     * @return $this
+     */
+    public function top($top){
+        $this->top = $top;
+
+        return $this;
+    }
+
+    public function distinct($distinct)
+    {
+        $this->distinct = $distinct;
+
+        return $this;
+    }
+    /**
      * Set the records
      * @param $records
      * @return $this
@@ -112,7 +157,6 @@ class MinistryPlatformTableAPI
 
         return $this;
     }
-
 
     /**
      * Execute the GET request using defined parameters
@@ -128,62 +172,7 @@ class MinistryPlatformTableAPI
         $this->buildHttpHeader();
 
         // Get all of the results 1000 at a time
-        return  $this->getResults($endpoint);
-
-    }
-
-    /**
-     * Request data 1000 rows at a time until all data has been retrieved
-     * The JSON API returns a max of 1000 records per request.  Use 
-     * the $skip to move the results window 1000 records at a time.
-     * 
-     */
-    private function getResults($endpoint)
-    {
-        $results = [];
-        $this->errorMessage = null;
-
-        // Send the request
-        $client = new Client(); //GuzzleHttp\Client
-
-        do {
-            try {
-                $response = $client->request('GET', $endpoint, [
-                    'headers' => $this->headers,
-                    'query' => ['$select' => $this->select,
-                        '$filter' => $this->filter,
-                        '$orderby' => $this->orderby,
-                        '$skip' => $this->skip],
-                    'curl' => $this->setGetCurlopts(),
-                ]);
-
-            } catch (\GuzzleException $e) {
-                $this->errorMessage = $e->getResponse()->getBody()->getContents();
-                return false;
-
-            } catch (\GuzzleHttp\Exception\ClientException $e) {
-                $this->errorMessage = $e->getResponse()->getBody()->getContents();
-                return false;
-            } catch (\GuzzleHttp\Exception\ServerException $e) {
-                $this->errorMessage = $e->getResponse()->getBody()->getContents();
-                return false;
-            }
-
-            $r = json_decode($response->getBody(), true);
-            
-            // Get the number of rows returned
-            $num = count($r);
-
-            // Add this result set to the previous results
-            $results = array_merge($results, $r);
-
-            // Skip the rows we just got back if there were 1000 of them and query again
-            ($num == 1000)? $this->skip += 1000 : $this->skip = 0;
-
-        } while ( $this->skip > 0 );
-
-        $this->reset();
-        return $results;
+        return $this->getResults($endpoint);
     }
 
     /**
@@ -207,7 +196,7 @@ class MinistryPlatformTableAPI
      */
     public function put()
     {
-        $r =  $this->sendData('PUT');
+        $r = $this->sendData('PUT');
         $this->reset();
 
         return $r;
@@ -216,7 +205,7 @@ class MinistryPlatformTableAPI
     // POST a new record to the database
     public function post()
     {
-        $r =  $this->sendData('POST');
+        $r = $this->sendData('POST');
         $this->reset();
 
         return $r;
@@ -243,7 +232,7 @@ class MinistryPlatformTableAPI
         try {
 
             $response = $client->request('DELETE', $endpoint, [
-                'headers' => $this->headers,                
+                'headers' => $this->headers,
                 'curl' => $this->setGetCurlopts(),
             ]);
 
@@ -260,11 +249,68 @@ class MinistryPlatformTableAPI
         }
 
         return $results = json_decode($response->getBody(), true);
-
     }
 
+    /**
+     * Request data 1000 rows at a time until all data has been retrieved
+     * The JSON API returns a max of 1000 records per request.  Use
+     * the $skip to move the results window 1000 records at a time.
+     *
+     */
+    private function getResults($endpoint)
+    {
+        $results = [];
+        $this->errorMessage = null;
 
-    private function sendData($verb) {
+        // Send the request
+        $client = new Client(); //GuzzleHttp\Client
+
+        do {
+            try {
+                $response = $client->request('GET', $endpoint, [
+                    'headers' => $this->headers,
+                    'query' => ['$select' => $this->select,
+                        '$filter' => $this->filter,
+                        '$orderby' => $this->orderby,
+                        '$groupby' => $this->groupby,
+                        '$having' => $this->having,
+                        '$top' => $this->top,
+                        '$skip' => $this->skip,
+                        '$distinct' => $this->distinct
+                    ],
+                    'curl' => $this->setGetCurlopts(),
+                ]);
+
+            } catch (\GuzzleException $e) {
+                $this->errorMessage = $e->getResponse()->getBody()->getContents();
+                return false;
+            } catch (\GuzzleHttp\Exception\ClientException $e) {
+                $this->errorMessage = $e->getResponse()->getBody()->getContents();
+                return false;
+            } catch (\GuzzleHttp\Exception\ServerException $e) {
+                $this->errorMessage = $e->getResponse()->getBody()->getContents();
+                return false;
+            }
+
+            $r = json_decode($response->getBody(), true);
+
+            // Get the number of rows returned
+            $num = count($r);
+
+            // Add this result set to the previous results
+            $results = array_merge($results, $r);
+
+            // Skip the rows we just got back if there were 1000 of them and query again
+            ($num == 1000) ? $this->skip += 1000 : $this->skip = 0;
+
+        } while ($this->skip > 0);
+
+        $this->reset();
+        return $results;
+    }
+
+    private function sendData($verb)
+    {
 
         // Set the endpoint
         $endpoint = $this->buildEndpoint();
@@ -274,8 +320,6 @@ class MinistryPlatformTableAPI
 
         // Send the request
         $client = new Client(); //GuzzleHttp\Client
-
-        echo $this->records . "\n";
 
         try {
 
@@ -301,7 +345,7 @@ class MinistryPlatformTableAPI
         return $results = json_decode($response->getBody(), true);
     }
 
-  
+
     /**
      * Construct the API Endpoint for the request
      *
@@ -311,14 +355,13 @@ class MinistryPlatformTableAPI
     {
         return $this->apiEndpoint . '/tables/' . $this->tableName . '/';
     }
-   
+
     private function buildHttpHeader()
     {
         // Set the header
         $auth = 'Authorization: ' . $this->token_type . ' ' . $this->access_token;
         $scope = 'Scope: ' . $this->scope;
         $this->headers = ['Accept: application/json', 'Content-type: application/json', $auth, $scope];
-
     }
 
     /**
@@ -331,10 +374,14 @@ class MinistryPlatformTableAPI
         $this->filter = null;
         $this->orderby = null;
         $this->skip = 0;
+        $this->groupby = null;
+        $this->having = null;
+        $this->top = null;
+        $this->distinct = null;
+
         $this->recordID = null;
 
         $this->records = null;
-
     }
 
     /**

@@ -29,7 +29,7 @@ Or, you can edit your composer.json file directly to add the Ministry Platform A
 ```
 "require": {
         "php": ">=7.0.0",
-        "smadeira/ministry-platform-api": "^2.0.0"
+        "smadeira/ministry-platform-api": "^2"
     },
 ```
 
@@ -67,12 +67,13 @@ MP_API_SCOPE="http://www.thinkministry.com/dataplatform/scopes/all"
 At the top of your code you will need to do a couple things to get access to the API Wrapper. You need to include autoload capabilities and load the 
 config settings from the .env file
 
-This is an example of what the top of a script might look like.
+This is an example of what the top of a script might look like to use the Table API and the Stored Procedures API.
 
 ```php
 require_once __DIR__ . '/vendor/autoload.php';
 
-use MinistryPlatformAPI\MinistryPlatformAPI as MP;
+use MinistryPlatformAPI\MinistryPlatformTableAPI as MP;
+use MinistryPlatformAPI\MinistryPlatformProcAPI as PROC;
 
 // Get environment variables
 $dotenv = new Dotenv\Dotenv(__DIR__);
@@ -86,8 +87,13 @@ Usage is straight forward.  Authenticate and execute your request.
 Assuming your .env parameters are correct, this will authenticate your code 
 
 ```php
+// For the Table API enpoints 
 $mp = new MP();
 $mp->authenticate();
+
+// For the Procedures API endpoint
+$proc = new PROC();
+$proc->authenticate();
 ```
 
 ### Execute select query
@@ -108,7 +114,7 @@ print_r($events);
 ```
 
 ### The whole script
-Here is the whole script that gets events in the next 30 days.
+Here is a whole script that gets events in the next 30 days.
 
 ```php
 <?php
@@ -172,6 +178,38 @@ Note that in both POSTing and PUTing, the API will return the resulting records.
 not the whole record(s), you can specify those fields in the select() method.  Effectively, the API is doing the POST or PUT and then 
 returning the results of a GET all in one operation.  
 
-## Still to be Done
-As of now the wrapper only handles GET,POST and PUT to the tables because that is all I've needed.  DELETE is not implemented almost on purpose to 
-prevent me from doing something silly. If there is a need, it can be implemented fairly easily.
+### Deleting Records
+Existing table rows can be deleted by calling the delete method and passing the id of the row to delete.  For example, to delete the contact with 
+contact_id of 24599, execute this command:
+
+```phpo
+$contact = $mp->table('Contacts')->delete(24599);
+```
+As of now, delete only works with single record deletes.  The multiple record delete has not been implemented.
+
+### Executing Procedures
+Procedures can be executed using the Procedures API endpoint.  This example gets the selected contacts using a custom procedure written for our PCO integration.
+```php
+<?php
+
+require_once __DIR__ . '/vendor/autoload.php';
+
+use MinistryPlatformAPI\MinistryPlatformProcAPI as PROC;
+
+// Get environment variables
+$dotenv = new Dotenv\Dotenv(__DIR__);
+$dotenv->load();
+
+
+// Attempt to authenticate to the MP API
+
+$mp = new PROC();
+$mp->authenticate();
+
+$input = ['@SelectionID' => 26918];
+$contacts = $mp->proc('api_MYGCC_PCOGetSelectedContacts')             
+             ->procInput($input)
+             ->exec();
+
+print_r($contacts);
+```
