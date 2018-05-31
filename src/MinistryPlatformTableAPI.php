@@ -197,16 +197,14 @@ class MinistryPlatformTableAPI
     public function put()
     {
         $r = $this->sendData('PUT');
-        $this->reset();
-
+        
         return $r;
     }
 
     // POST a new record to the database
     public function post()
     {
-        $r = $this->sendData('POST');
-        $this->reset();
+        $r = $this->sendData('POST');        
 
         return $r;
     }
@@ -309,6 +307,8 @@ class MinistryPlatformTableAPI
         return $results;
     }
 
+
+
     private function sendData($verb)
     {
 
@@ -322,6 +322,7 @@ class MinistryPlatformTableAPI
         $client = new Client(); //GuzzleHttp\Client
 
         try {
+            $error = false;
 
             $response = $client->request($verb, $endpoint, [
                 'headers' => $this->headers,
@@ -332,17 +333,22 @@ class MinistryPlatformTableAPI
 
         } catch (\GuzzleException $e) {
             $this->errorMessage = $e->getResponse()->getBody()->getContents();
-            return false;
-
+            $error = true;
         } catch (\GuzzleHttp\Exception\ClientException $e) {
             $this->errorMessage = $e->getResponse()->getBody()->getContents();
-            return false;
+            $error = true;
         } catch (\GuzzleHttp\Exception\ServerException $e) {
             $this->errorMessage = $e->getResponse()->getBody()->getContents();
-            return false;
+            $error = true;
+        } catch (Exception $e) {
+            $error = 'Unknown Exception in Guzzle request';
+            $this->saveErrorMessage($error);
+            $error = true;
+        } finally {
+            $this->reset();    
         }
 
-        return $results = json_decode($response->getBody(), true);
+        return ! $error;
     }
 
 
