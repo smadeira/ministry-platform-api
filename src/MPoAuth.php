@@ -1,6 +1,9 @@
 <?php namespace MinistryPlatformAPI;
 
 use GuzzleHttp\Client;
+use Illuminate\Cache\CacheManager;
+use Illuminate\Container\Container;
+use Illuminate\Filesystem\Filesystem;
 
 trait MPoAuth
 {
@@ -46,6 +49,37 @@ trait MPoAuth
 
         return $this;
     }
+
+    public function cacheTest(){
+        // Create a new Container object, needed by the cache manager.
+        $container = new Container;
+        // The CacheManager creates the cache "repository" based on config values
+        // which are loaded from the config class in the container.
+        // More about the config class can be found in the config component; for now we will use an array
+        $container['config'] = [
+            'cache.default' => 'file',
+            'cache.stores.file' => [
+                'driver' => 'file',
+                'path' => __DIR__ . '/cache'
+            ]
+        ];
+
+        // To use the file cache driver we need an instance of Illuminate's Filesystem, also stored in the container
+        $container['files'] = new Filesystem;
+        // Create the CacheManager
+        $cacheManager = new CacheManager($container);
+        // Get the default cache driver (file in this case)
+        $cache = $cacheManager->store();
+        // Or, if you have multiple drivers:
+        // $cache = $cacheManager->store('file');
+        // Store a value into cache for 500 minutes
+        $cache->put('test', 'This is loaded from cache.', 500);
+        // Echo out the value we just stored in cache
+        echo $cache->get('test');
+
+
+    }
+
 
     /**
      * Field list for oAuth authentication

@@ -1,7 +1,7 @@
 <?php namespace MinistryPlatformAPI;
 
 use GuzzleHttp\Client;
-use MinistryPlatformAPI\MPoAuth;
+// use MinistryPlatformAPI\MPoAuth;
 
 class MinistryPlatformTableAPI
 {
