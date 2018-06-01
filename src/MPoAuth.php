@@ -1,9 +1,7 @@
 <?php namespace MinistryPlatformAPI;
 
 use GuzzleHttp\Client;
-use Illuminate\Cache\CacheManager;
-use Illuminate\Container\Container;
-use Illuminate\Filesystem\Filesystem;
+
 
 trait MPoAuth
 {
@@ -29,57 +27,72 @@ trait MPoAuth
      *
      * @var null
      */
-    private $access_token = null;
-    private $token_type = null;
-    private $scope = null;
-    private $expires_in = null;
+    private $credentials = null;
 
-    
     /**
      * Performs discovery request and gets the token
      * @return $this|bool
      */
     public function authenticate()
     {
-        // Get the Discovery URI
-        if (! $this->endpointDiscovery()) return false;
+        if (! $this->credentials) {
+            $this->credentials = new Credentials;
+        }
 
-        // Request a token
-        if (! $this->getToken() ) return false;
+        if (! $token = $this->credentials->get()){
+
+            // Get the Discovery URI
+            if (!$this->endpointDiscovery()) return false;
+
+            // Request a token
+            if (!$this->getToken()) return false;
+        }
 
         return $this;
     }
 
-    public function cacheTest(){
-        // Create a new Container object, needed by the cache manager.
-        $container = new Container;
-        // The CacheManager creates the cache "repository" based on config values
-        // which are loaded from the config class in the container.
-        // More about the config class can be found in the config component; for now we will use an array
-        $container['config'] = [
-            'cache.default' => 'file',
-            'cache.stores.file' => [
-                'driver' => 'file',
-                'path' => __DIR__ . '/cache'
-            ]
-        ];
+    /**
+     * Erase the credentials
+     *
+     * @return bool
+     */
+    public function clear()
+    {
+        if (! $this->credentials) {
+            $this->credentials = new Credentials;
+        }
 
-        // To use the file cache driver we need an instance of Illuminate's Filesystem, also stored in the container
-        $container['files'] = new Filesystem;
-        // Create the CacheManager
-        $cacheManager = new CacheManager($container);
-        // Get the default cache driver (file in this case)
-        $cache = $cacheManager->store();
-        // Or, if you have multiple drivers:
-        // $cache = $cacheManager->store('file');
-        // Store a value into cache for 500 minutes
-        $cache->put('test', 'This is loaded from cache.', 500);
-        // Echo out the value we just stored in cache
-        echo $cache->get('test');
+        $this->credentials->forget();
 
-
+        return true;
     }
 
+    /**
+     * Get a new Access token
+     *
+     * @return bool
+     */
+    private function getToken()
+    {
+        // Request the token
+        $client = new Client(); //GuzzleHttp\Client
+
+        try {
+            $response = $client->post($this->token_endpoint, [
+                'form_params' => $this->getOauthFields(),
+                'curl' => $this->setOauthCurlopts(),
+            ]);
+
+            // Get the token and type from the response
+            $this->parseTokenResponse($response);
+
+        } catch (GuzzleException $e) {
+
+            return false;
+        }
+
+        return true;
+    }
 
     /**
      * Field list for oAuth authentication
@@ -109,12 +122,27 @@ trait MPoAuth
     {
         $body = json_decode($response->getBody(), true);
 
-        $this->access_token = $body['access_token'];
-        $this->token_type = $body['token_type'];
-        // $this->scope = $body['scope'];
-        $this->expires_in = $body['expires_in'];
+        $this->credentials->save($body);
+
     }
 
+    /**
+     * Parse the response from the discovery endpoint and save the URIs
+     *
+     * @param $response
+     */
+    private function parseDiscoveryResponse($response)
+    {
+        $body = json_decode($response->getBody(), true);
+
+        $this->authorization_endpoint = $body['authorization_endpoint'];
+        $this->token_endpoint = $body['token_endpoint'];
+        $this->end_session_endpoint = $body['end_session_endpoint'];
+        $this->userinfo_endpoint = $body['userinfo_endpoint'];
+        $this->jwks_uri = $body['jwks_uri'];
+
+        $this->scopes_supported = $body['scopes_supported'];
+    }
 
     /**
      * Query discovery endpoint for available resources and capabilities
@@ -142,72 +170,17 @@ trait MPoAuth
     }
 
     /**
-     * Get the Access token
-     *
-     * @return bool
-     */
-    private function getToken()
-    {
-        // Request the token
-        $client = new Client(); //GuzzleHttp\Client
-
-        try {
-            $response = $client->post($this->token_endpoint, [
-                'form_params' => $this->getOauthFields(),
-                'curl' => $this->setOauthCurlopts(),
-            ]);
-
-            // Get the token and type from the response
-            $this->parseTokenResponse($response);
-
-        } catch (GuzzleException $e) {
-
-            return false;
-        }
-
-        return true;
-    }
-
-
-    /**
-     * Parse the response from the discovery endpoint and save the URIs
-     *
-     * @param $response
-     */
-    private function parseDiscoveryResponse($response)
-    {
-        $body = json_decode($response->getBody(), true);
-
-        $this->authorization_endpoint = $body['authorization_endpoint'];
-        $this->token_endpoint = $body['token_endpoint'];
-        $this->end_session_endpoint = $body['end_session_endpoint'];
-        $this->userinfo_endpoint = $body['userinfo_endpoint'];
-        $this->jwks_uri = $body['jwks_uri'];
-
-        $this->scopes_supported = $body['scopes_supported'];
-    }
-
-    /**
      * Initialize the class.  Called from the constructor
      *
      */
     private function initialize()
-    {
-        // Read the config file
-        $this->setParams();
-
-    }
-
-    /**
-     * Get connection parameters from env file
-     */
-    private function setParams()
     {
         $this->apiEndpoint = getenv('MP_API_ENDPOINT', null);
         $this->oAuthDiscoveryUrl = getenv('MP_OAUTH_DISCOVERY_ENDPOINT', null);
         $this->mpClientId = getenv('MP_CLIENT_ID', null);
         $this->mpClientSecret = getenv('MP_CLIENT_SECRET', null);
         $this->scope = getenv('MP_API_SCOPE', null);
+
     }
 
     /**
@@ -226,7 +199,7 @@ trait MPoAuth
 
         return $curlopts;
     }
-    
+
 
     /**
      * CURLOPTS for a discovery request

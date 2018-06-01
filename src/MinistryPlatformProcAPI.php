@@ -1,7 +1,7 @@
 <?php namespace MinistryPlatformAPI;
 
 use GuzzleHttp\Client;
-use MinistryPlatformAPI\MPoAuth;
+
 
 class MinistryPlatformProcAPI
 {
@@ -133,10 +133,9 @@ class MinistryPlatformProcAPI
     private function buildHttpHeader()
     {
         // Set the header
-        $auth = 'Authorization: ' . $this->token_type . ' ' . $this->access_token;
+        $auth = 'Authorization: ' . $this->credentials->get('token');
         $scope = 'Scope: ' . $this->scope;
         $this->headers = ['Accept: application/json', 'Content-type: application/json', $auth, $scope];
-
     }
    
     /**
