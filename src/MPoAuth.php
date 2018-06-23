@@ -68,6 +68,45 @@ trait MPoAuth
     }
 
     /**
+     * Authenticate using Authorization Code grant type
+     * @return bool
+     */
+    public function authorizationCode()
+    {
+        // Get the Discovery URI
+        if (!$this->endpointDiscovery()) return false;
+
+        $url = $this->authorization_endpoint;
+        $url .= '?response_type=code';
+        $url .= '&client_id=mygccpco';
+        $url .= '&scope=http://www.thinkministry.com/dataplatform/scopes/all openid';
+        $url .= '&redirect_uri=https://scottmadeira.com';
+
+        // Discover the endpoints
+        $client = new Client(); //GuzzleHttp\Client
+
+        try {
+            $response = $client->get($url, [
+                'curl' => $this->setDiscoveryCurlopts(),
+            ]);
+
+            // Parse the response
+            $body = json_decode($response->getBody(), true);
+            dd($body);
+
+        } catch (GuzzleException $e) {
+
+            return false;
+            dd('Big Error authorization code function');
+        }
+
+        return true;
+
+    }
+
+
+
+    /**
      * Get a new Access token
      *
      * @return bool

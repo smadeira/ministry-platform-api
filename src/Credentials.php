@@ -6,7 +6,6 @@ use Illuminate\Filesystem\Filesystem;
 
 class Credentials
 {
-
     /**
      * Instance of the cache
      * @var null
