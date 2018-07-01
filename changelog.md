@@ -1,7 +1,7 @@
 # Changelog for Ministry Platform API Wrapper
 
 
-## 2.2.9 (2018-07-01)
+## 2.2.10 (2018-07-01)
 
 - Fixed distinct() to parse ture, false, 1 and 0 and convert to a string that the API requires
 
