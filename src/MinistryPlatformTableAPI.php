@@ -141,7 +141,7 @@ class MinistryPlatformTableAPI
 
     public function distinct($distinct)
     {
-        $this->distinct = $distinct;
+        $this->distinct = $distinct ? 'true' : 'false';
 
         return $this;
     }
@@ -195,17 +195,15 @@ class MinistryPlatformTableAPI
      */
     public function put()
     {
-        $r = $this->sendData('PUT');
+       return $this->sendData('PUT');
         
-        return $r;
     }
 
     // POST a new record to the database
     public function post()
     {
-        $r = $this->sendData('POST');        
+        return $this->sendData('POST');
 
-        return $r;
     }
 
     /**
@@ -320,8 +318,8 @@ class MinistryPlatformTableAPI
         // Send the request
         $client = new Client(); //GuzzleHttp\Client
 
-        try {
-            $error = false;
+        $error = true;
+        try {            
 
             $response = $client->request($verb, $endpoint, [
                 'headers' => $this->headers,
@@ -330,24 +328,26 @@ class MinistryPlatformTableAPI
                 'curl' => $this->setPutCurlopts(),
             ]);
 
+            $error = false;
+
         } catch (\GuzzleException $e) {
-            $this->errorMessage = $e->getResponse()->getBody()->getContents();
-            $error = true;
+            $this->errorMessage = $e->getResponse()->getBody()->getContents();            
+
         } catch (\GuzzleHttp\Exception\ClientException $e) {
             $this->errorMessage = $e->getResponse()->getBody()->getContents();
-            $error = true;
+
         } catch (\GuzzleHttp\Exception\ServerException $e) {
             $this->errorMessage = $e->getResponse()->getBody()->getContents();
-            $error = true;
+
         } catch (Exception $e) {
-            $error = 'Unknown Exception in Guzzle request';
-            $this->saveErrorMessage($error);
-            $error = true;
+            $this->errorMessage = 'Unknown Exception in Guzzle request';
+            
         } finally {
             $this->reset();    
         }
+    
+        return $error ? $error : json_decode($response->getBody(), true);
 
-        return ! $error;
     }
 
 
