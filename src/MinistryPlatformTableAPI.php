@@ -4,7 +4,8 @@ use GuzzleHttp\Client;
 
 class MinistryPlatformTableAPI
 {
-    use MPoAuth;
+
+    protected $credentials = null;
 
     /**
      * parameters to be used for the Tables API calls
@@ -21,9 +22,17 @@ class MinistryPlatformTableAPI
     protected $distinct = null;
     protected $skip = 0;
 
+    /**
+     * For single record GETs, specify the PK of the record of interest
+     * @var null
+     */
     protected $recordID = null;
 
-    // Row data for update requests
+
+    /**
+     * For POST and PUT, this is the data to be input to the database.
+     * @var null
+     */
     protected $records = null;
 
     /**
@@ -33,16 +42,25 @@ class MinistryPlatformTableAPI
     private $apiEndpoint = null;
     private $headers;
 
+    /**
+     * Error message from Guzzle requests
+     *
+     * @var null
+     */
     private $errorMessage = null;
 
+
     /**
-     * Set basic variables.
+     * Authenticate to the API and get a token
      *
-     * MinistryPlatformAPI constructor.
+     * @param string $grantType
      */
-    public function __construct()
+    public function authenticate()
     {
-        $this->initialize();
+        $cc = new oAuthClientCredentials;
+        $this->credentials = $cc->clientCredentials();
+
+        return $this;
     }
 
     /**
@@ -58,6 +76,11 @@ class MinistryPlatformTableAPI
         return $this;
     }
 
+    /**
+     * Set the recordID for
+     * @param $recordID
+     * @return $this
+     */
     public function record($recordID)
     {
         $this->recordID = $recordID;
@@ -139,6 +162,11 @@ class MinistryPlatformTableAPI
         return $this;
     }
 
+    /**
+     * Set the Distinct attribute for the query
+     * @param $distinct
+     * @return $this
+     */
     public function distinct($distinct)
     {
         $this->distinct = $distinct ? 'true' : 'false';
@@ -175,6 +203,47 @@ class MinistryPlatformTableAPI
     }
 
     /**
+     * Get a single record from a defined table
+     */
+    public function getSingle()
+    {
+        // Set the endpoint
+        $endpoint = $this->buildEndpoint();
+
+        // Set the header
+        $this->buildHttpHeader();
+
+        // Send the request
+        $client = new Client(); //GuzzleHttp\Client
+
+        try {
+            $response = $client->request('GET', $endpoint, [
+                'headers' => $this->headers,
+                'query' => ['$select' => $this->select,
+                    'id' => $this->recordID,
+                ],
+                'curl' => $this->setGetCurlopts(),
+            ]);
+
+        } catch (\GuzzleException $e) {
+            $this->errorMessage = $e->getResponse()->getBody()->getContents();
+            return false;
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            $this->errorMessage = $e->getResponse()->getBody()->getContents();
+            return false;
+        } catch (\GuzzleHttp\Exception\RequestException $e) {
+            $this->errorMessage = $e->getResponse()->getBody()->getContents();
+            return false;
+        } catch (\GuzzleHttp\Exception\ServerException $e) {
+            $this->errorMessage = $e->getResponse()->getBody()->getContents();
+            return false;
+        }
+
+        return json_decode($response->getBody(), true);
+
+    }
+
+    /**
      * Get only the first returned result
      *
      * @return bool
@@ -185,7 +254,6 @@ class MinistryPlatformTableAPI
             $this->reset();
             return $results[0];
         }
-
         return false;
     }
 
@@ -196,14 +264,12 @@ class MinistryPlatformTableAPI
     public function put()
     {
        return $this->sendData('PUT');
-        
     }
 
     // POST a new record to the database
     public function post()
     {
         return $this->sendData('POST');
-
     }
 
     /**
@@ -282,6 +348,9 @@ class MinistryPlatformTableAPI
             } catch (\GuzzleHttp\Exception\ClientException $e) {
                 $this->errorMessage = $e->getResponse()->getBody()->getContents();
                 return false;
+            } catch (\GuzzleHttp\Exception\RequestException $e) {
+                $this->errorMessage = $e->getResponse()->getBody()->getContents();
+                return false;
             } catch (\GuzzleHttp\Exception\ServerException $e) {
                 $this->errorMessage = $e->getResponse()->getBody()->getContents();
                 return false;
@@ -304,8 +373,13 @@ class MinistryPlatformTableAPI
         return $results;
     }
 
-
-
+    /**
+     * Execute a PUT or POST request
+     *
+     * @param $verb
+     * @return bool|mixed
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
     private function sendData($verb)
     {
 
@@ -346,10 +420,9 @@ class MinistryPlatformTableAPI
             $this->reset();    
         }
     
-        return $error ? $error : json_decode($response->getBody(), true);
+        return $error ? (! $error) : json_decode($response->getBody(), true);
 
     }
-
 
     /**
      * Construct the API Endpoint for the request
@@ -358,14 +431,19 @@ class MinistryPlatformTableAPI
      */
     private function buildEndpoint()
     {
-        return $this->apiEndpoint . '/tables/' . $this->tableName . '/';
+        $endpoint = $this->credentials->apiEndpoint . '/tables/' . $this->tableName . '/';
+
+        // If there is a specific record ID, append that to the endpoint
+        if ($this->recordID) { $endpoint .= $this->recordID; }
+
+        return $endpoint;
     }
 
     private function buildHttpHeader()
     {
         // Set the header
-        $auth = 'Authorization: ' . $this->credentials->get('token');
-        $scope = 'Scope: ' . $this->scope;
+        $auth = 'Authorization: ' . $this->credentials->credentials->get('token');
+        $scope = 'Scope: ' . $this->credentials->scope;
         $this->headers = ['Accept: application/json', 'Content-type: application/json', $auth, $scope];
     }
 
@@ -437,5 +515,10 @@ class MinistryPlatformTableAPI
     public function errorMessage()
     {
         return $this->errorMessage;
+    }
+
+    public function clearCredentials()
+    {
+        $this->credentials->clear();
     }
 }

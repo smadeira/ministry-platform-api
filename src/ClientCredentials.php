@@ -4,7 +4,7 @@ use Illuminate\Cache\CacheManager;
 use Illuminate\Container\Container;
 use Illuminate\Filesystem\Filesystem;
 
-class Credentials
+class ClientCredentials
 {
     /**
      * Instance of the cache
