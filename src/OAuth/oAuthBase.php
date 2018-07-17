@@ -1,4 +1,4 @@
-<?php namespace MinistryPlatformAPI;
+<?php namespace MinistryPlatformAPI\OAuth;
 
 use GuzzleHttp\Client;
 
@@ -16,9 +16,11 @@ class oAuthBase
      */
     protected $mpClientSecret = null;
 
-
+    /**
+     * For authorization Code grant types.  Redirect URL for authorization
+     * @var null
+     */
     protected $mpRedirectURL = null;
-
 
     /**
      * oAuth Discovery URL - provides available endpoints
@@ -26,33 +28,59 @@ class oAuthBase
      */
     protected $oAuthDiscoveryUrl = null;
 
+    /**
+     * URL to request authorization - Authorization Code grants
+     * @var null
+     */
     protected $authorization_endpoint = null;
 
+    /**
+     * URL to get a token
+     * @var null
+     */
     protected $token_endpoint = null;
 
+    /**
+     * URL to end an oAuth Session
+     * @var null
+     */
     protected $end_session_endpoint = null;
 
+    /**
+     * Endpoint for logged in user information
+     * @var null
+     */
     protected $userinfo_endpoint = null;
 
+    /**
+     * Unused - java web token endpoint
+     * @var null
+     */
     protected $jwks_uri = null;
 
-
+    /**
+     * List of scopes supported by this oAuth server
+     * @var null
+     */
     protected $scopes_supported = null;
 
     /**
-     * Scope used in API calls
+     * Scope being used in API calls
      * @var null
      */
     public $scope = null;
 
-
-
+    /**
+     * Holding place for error message.
+     * @var
+     */
     protected $errorMessage;
 
-
+    /**
+     * Fields used by Guzzle to call endpoints
+     */
     protected $oAuthFields = null;
     protected $fieldCount = null;
-
 
     /**
      * Query discovery endpoint for available resources and capabilities
@@ -83,7 +111,7 @@ class oAuthBase
             return false;
         }
 
-        return $results = json_decode($response->getBody(), true);
+        return json_decode($response->getBody(), true);
     }
 
     /**
@@ -109,7 +137,7 @@ class oAuthBase
      *
      * Called from the constructor
      */
-    protected function initialize()
+    protected function getCongfigParameters()
     {
         $this->apiEndpoint = getenv('MP_API_ENDPOINT', null);
         $this->oAuthDiscoveryUrl = getenv('MP_OAUTH_DISCOVERY_ENDPOINT', null);

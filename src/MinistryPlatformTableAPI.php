@@ -2,24 +2,63 @@
 
 use GuzzleHttp\Client;
 
-class MinistryPlatformTableAPI
+
+class MinistryPlatformTableAPI extends MinistryPlatformBaseAPI
 {
-
-    protected $credentials = null;
-
     /**
      * parameters to be used for the Tables API calls
      *
      * @var null
      */
     protected $tableName = null;
+
+    /**
+     * Fields to be returned in a GET.  API will return all fields in
+     * POST and PUT operations unless limited by a field list specified here.
+     * @var string
+     */
     protected $select = '*';
+
+    /**
+     * WHERE clause in "MP-SQL" format
+     * @var null
+     */
     protected $filter = null;
+
+    /**
+     * Sort order of results
+     * @var null
+     */
     protected $orderby = null;
+
+    /**
+     * Grouping for aggregation functions
+     * @var null
+     */
     protected $groupby = null;
+
+    /**
+     * SQL Having clause
+     * @var null
+     */
     protected $having = null;
+
+    /**
+     * Top clause to limit rows returned
+     * @var null
+     */
     protected $top = null;
+
+    /**
+     * SQL Distinct
+     * @var null
+     */
     protected $distinct = null;
+
+    /**
+     * Pagination control.  Skip a certain number of rows.
+     * @var int
+     */
     protected $skip = 0;
 
     /**
@@ -27,41 +66,6 @@ class MinistryPlatformTableAPI
      * @var null
      */
     protected $recordID = null;
-
-
-    /**
-     * For POST and PUT, this is the data to be input to the database.
-     * @var null
-     */
-    protected $records = null;
-
-    /**
-     * Stuff needed to execute the request
-     *
-     */
-    private $apiEndpoint = null;
-    private $headers;
-
-    /**
-     * Error message from Guzzle requests
-     *
-     * @var null
-     */
-    private $errorMessage = null;
-
-
-    /**
-     * Authenticate to the API and get a token
-     *
-     * @param string $grantType
-     */
-    public function authenticate()
-    {
-        $cc = new oAuthClientCredentials;
-        $this->credentials = $cc->clientCredentials();
-
-        return $this;
-    }
 
     /**
      * Set the table for the GET request
@@ -140,7 +144,7 @@ class MinistryPlatformTableAPI
     }
 
     /**
-     * Set the Having caluse for the GET request
+     * Set the Having clause for the GET request
      * @param $having
      * @return $this
      */
@@ -180,7 +184,7 @@ class MinistryPlatformTableAPI
      */
     public function records(Array $records)
     {
-        $this->records = json_encode($records);
+        $this->postFields = json_encode($records);
 
         return $this;
     }
@@ -283,7 +287,6 @@ class MinistryPlatformTableAPI
 
         $endpoint .= '/' . $id;
 
-
         // Set the header
         $this->buildHttpHeader();
 
@@ -373,65 +376,15 @@ class MinistryPlatformTableAPI
         return $results;
     }
 
-    /**
-     * Execute a PUT or POST request
-     *
-     * @param $verb
-     * @return bool|mixed
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     */
-    private function sendData($verb)
-    {
-
-        // Set the endpoint
-        $endpoint = $this->buildEndpoint();
-
-        // Set the header
-        $this->buildHttpHeader();
-
-        // Send the request
-        $client = new Client(); //GuzzleHttp\Client
-
-        $error = true;
-        try {            
-
-            $response = $client->request($verb, $endpoint, [
-                'headers' => $this->headers,
-                'query' => ['$select' => $this->select],
-                'body' => $this->records,
-                'curl' => $this->setPutCurlopts(),
-            ]);
-
-            $error = false;
-
-        } catch (\GuzzleException $e) {
-            $this->errorMessage = $e->getResponse()->getBody()->getContents();            
-
-        } catch (\GuzzleHttp\Exception\ClientException $e) {
-            $this->errorMessage = $e->getResponse()->getBody()->getContents();
-
-        } catch (\GuzzleHttp\Exception\ServerException $e) {
-            $this->errorMessage = $e->getResponse()->getBody()->getContents();
-
-        } catch (Exception $e) {
-            $this->errorMessage = 'Unknown Exception in Guzzle request';
-            
-        } finally {
-            $this->reset();    
-        }
-    
-        return $error ? (! $error) : json_decode($response->getBody(), true);
-
-    }
 
     /**
      * Construct the API Endpoint for the request
      *
      * @return string
      */
-    private function buildEndpoint()
+    protected function buildEndpoint()
     {
-        $endpoint = $this->credentials->apiEndpoint . '/tables/' . $this->tableName . '/';
+        $endpoint = $this->authorization->apiEndpoint . '/tables/' . $this->tableName . '/';
 
         // If there is a specific record ID, append that to the endpoint
         if ($this->recordID) { $endpoint .= $this->recordID; }
@@ -439,11 +392,11 @@ class MinistryPlatformTableAPI
         return $endpoint;
     }
 
-    private function buildHttpHeader()
+    protected function buildHttpHeader()
     {
         // Set the header
-        $auth = 'Authorization: ' . $this->credentials->credentials->get('token');
-        $scope = 'Scope: ' . $this->credentials->scope;
+        $auth = 'Authorization: ' . $this->authorization->credentials->getAccessToken();
+        $scope = 'Scope: ' . $this->authorization->scope;
         $this->headers = ['Accept: application/json', 'Content-type: application/json', $auth, $scope];
     }
 
@@ -464,48 +417,10 @@ class MinistryPlatformTableAPI
 
         $this->recordID = null;
 
-        $this->records = null;
+        $this->postFields = null;
     }
 
-    /**
-     * Set the cUrl Options for a get request
-     *
-     * @return array
-     */
-    private function setGetCurlopts()
-    {
-        $curlopts = [
-            CURLOPT_HTTPHEADER => $this->headers,
-            CURLOPT_POST => 0,
-            CURLOPT_HEADER => 0,
-            CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_VERBOSE => false,
-            CURLOPT_RETURNTRANSFER => true
-        ];
 
-        return $curlopts;
-    }
-
-    /**
-     * Set the cUrl Options for a PUT request
-     *
-     * @return array
-     */
-    private function setPutCurlopts()
-    {
-
-        $curlopts = [
-            CURLOPT_HTTPHEADER => $this->headers,
-            CURLOPT_POST => 1,
-            CURLOPT_POSTFIELDS => $this->records,
-            CURLOPT_HEADER => 0,
-            CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_VERBOSE => false,
-            CURLOPT_RETURNTRANSFER => true
-        ];
-
-        return $curlopts;
-    }
 
     /**
      * Return the error message from the request
@@ -517,8 +432,4 @@ class MinistryPlatformTableAPI
         return $this->errorMessage;
     }
 
-    public function clearCredentials()
-    {
-        $this->credentials->clear();
-    }
 }

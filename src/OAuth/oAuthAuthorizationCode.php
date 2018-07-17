@@ -1,4 +1,4 @@
-<?php namespace MinistryPlatformAPI;
+<?php namespace MinistryPlatformAPI\OAuth;
 
 use GuzzleHttp\Client;
 
@@ -7,7 +7,7 @@ class oAuthAuthorizationCode extends oAuthBase
 
     public function __construct()
     {
-        $this->initialize();
+        $this->getCongfigParameters();
     }
 
     /**
@@ -36,25 +36,27 @@ class oAuthAuthorizationCode extends oAuthBase
      */
     public function acquireAccessToken($code)
     {
+        // Get the Discovery URI
+        if (!$this->endpointDiscovery()) return false;
+
         // Request the token
         $client = new Client(); //GuzzleHttp\Client
 
         try {
             $response = $client->post($this->token_endpoint, [
-                'form_params' => $this->getTokenFields($code),
+                'form_params' => $this->getAccessTokenFields($code),
                 'curl' => $this->setOauthCurlopts(),
             ]);
 
             // Get the token and type from the response
             // $this->parseTokenResponse($response);
             $body = json_decode($response->getBody(), true);
-            dd($body);
 
         } catch (GuzzleException $e) {
 
             return false;
         }
-        return true;
+        return body;
     }
 
 
@@ -63,7 +65,7 @@ class oAuthAuthorizationCode extends oAuthBase
      *
      * @return array|null
      */
-    private function getTokenFields($code)
+    private function getAccessTokenFields($code)
     {
         $this->oAuthFields = [
             'grant_type' => 'authorization_code',

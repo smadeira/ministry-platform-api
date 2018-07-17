@@ -3,35 +3,15 @@
 use GuzzleHttp\Client;
 
 
-class MinistryPlatformProcAPI
+class MinistryPlatformProcAPI extends MinistryPlatformBaseAPI
 {
-    use MPoAuth;
-    
+
     /**
      *  parameters for calling procedures
      *
      */
     protected $procName = null;
-    protected $procInput = null;
 
-    /**
-     * Stuff needed to execute the request
-     *
-     */
-    private $apiEndpoint = null;
-    private $headers;
-
-    private $errorMessage = null;
-
-    /**
-     * Set basic variables.
-     *
-     * MinistryPlatformAPI constructor.
-     */
-    public function __construct()
-    {
-        $this->initialize();
-    }
 
     /**
      * Set the table for the GET request
@@ -48,7 +28,7 @@ class MinistryPlatformProcAPI
 
     public function procInput($procInput)
     {
-        $this->procInput = json_encode($procInput, true);
+        $this->postFields = json_encode($procInput, true);
 
         return $this;
     }
@@ -77,7 +57,7 @@ class MinistryPlatformProcAPI
      * @return bool|mixed
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    private function sendData() {
+    protected function sendData() {
 
         $this->errorMessage = null;
 
@@ -94,7 +74,7 @@ class MinistryPlatformProcAPI
 
             $response = $client->request('POST', $endpoint, [
                 'headers' => $this->headers,                
-                'body' => $this->procInput,
+                'body' => $this->postFields,
                 'curl' => $this->setPostCurlopts(),
             ]);
 
@@ -125,39 +105,19 @@ class MinistryPlatformProcAPI
      *
      * @return string
      */
-    private function buildEndpoint()
+    protected function buildEndpoint()
     {
         return $this->apiEndpoint . '/procs/' . $this->procName . '/';
     }
    
-    private function buildHttpHeader()
+    protected function buildHttpHeader()
     {
         // Set the header
         $auth = 'Authorization: ' . $this->credentials->get('token');
         $scope = 'Scope: ' . $this->scope;
         $this->headers = ['Accept: application/json', 'Content-type: application/json', $auth, $scope];
     }
-   
-    /**
-     * Set the cUrl Options for a POST request
-     *
-     * @return array
-     */
-    private function setPostCurlopts()
-    {
 
-        $curlopts = [
-            CURLOPT_HTTPHEADER => $this->headers,
-            CURLOPT_POST => 1,
-            CURLOPT_POSTFIELDS => $this->procInput,
-            CURLOPT_HEADER => 0,
-            CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_VERBOSE => false,
-            CURLOPT_RETURNTRANSFER => true
-        ];
-
-        return $curlopts;
-    }  
 
     /**
      * Return a Guzzle error message
