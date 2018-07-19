@@ -1,5 +1,6 @@
 <?php namespace MinistryPlatformAPI;
 
+use GuzzleHttp\Client;
 use MinistryPlatformAPI\OAuth\oAuthClientCredentials;
 
 abstract class MinistryPlatformBaseAPI
@@ -56,7 +57,7 @@ abstract class MinistryPlatformBaseAPI
      * @return bool|mixed
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    protected function sendData($verb)
+    protected function sendData($verb, $parameters)
     {
         // Set the endpoint
         $endpoint = $this->buildEndpoint();
@@ -70,12 +71,7 @@ abstract class MinistryPlatformBaseAPI
         $error = true;
         try {
 
-            $response = $client->request($verb, $endpoint, [
-                'headers' => $this->headers,
-                'query' => ['$select' => $this->select],
-                'body' => $this->postFields,
-                'curl' => $this->setPutCurlopts(),
-            ]);
+            $response = $client->request($verb, $endpoint, $parameters);
 
             $error = false;
 
@@ -91,12 +87,9 @@ abstract class MinistryPlatformBaseAPI
         } catch (Exception $e) {
             $this->errorMessage = 'Unknown Exception in Guzzle request';
 
-        } finally {
-            $this->reset();
         }
 
         return $error ? (! $error) : json_decode($response->getBody(), true);
-
     }
 
     /**

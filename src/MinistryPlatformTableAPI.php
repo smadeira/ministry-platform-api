@@ -244,7 +244,6 @@ class MinistryPlatformTableAPI extends MinistryPlatformBaseAPI
         }
 
         return json_decode($response->getBody(), true);
-
     }
 
     /**
@@ -267,13 +266,31 @@ class MinistryPlatformTableAPI extends MinistryPlatformBaseAPI
      */
     public function put()
     {
-       return $this->sendData('PUT');
+        $parameters = [
+            'headers' => $this->buildHttpHeader(),
+            'query' => ['$select' => $this->select],
+            'body' => $this->postFields,
+            'curl' => $this->setPostCurlopts(),
+        ];
+
+        $results = $this->sendData('PUT', $parameters);
+        $this->reset();
+        return $results;
     }
 
     // POST a new record to the database
     public function post()
     {
-        return $this->sendData('POST');
+        $parameters = [
+            'headers' => $this->buildHttpHeader(),
+            'query' => ['$select' => $this->select],
+            'body' => $this->postFields,
+            'curl' => $this->setPostCurlopts(),
+        ];
+
+        $results = $this->sendData('POST', $parameters);
+        $this->reset();
+        return $results;
     }
 
     /**
@@ -398,6 +415,8 @@ class MinistryPlatformTableAPI extends MinistryPlatformBaseAPI
         $auth = 'Authorization: ' . $this->authorization->credentials->getAccessToken();
         $scope = 'Scope: ' . $this->authorization->scope;
         $this->headers = ['Accept: application/json', 'Content-type: application/json', $auth, $scope];
+
+        return $this->headers;
     }
 
     /**
@@ -419,8 +438,6 @@ class MinistryPlatformTableAPI extends MinistryPlatformBaseAPI
 
         $this->postFields = null;
     }
-
-
 
     /**
      * Return the error message from the request
