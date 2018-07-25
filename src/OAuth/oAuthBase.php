@@ -82,6 +82,8 @@ class oAuthBase
     protected $oAuthFields = null;
     protected $fieldCount = null;
 
+    protected $headers = null;
+
     /**
      * Query discovery endpoint for available resources and capabilities
      * @return $this|bool
@@ -153,7 +155,7 @@ class oAuthBase
      *
      * @return array
      */
-    private function setDiscoveryCurlopts()
+    protected function setDiscoveryCurlopts()
     {
         $curlopts = [
             CURLOPT_POST => 0,
@@ -175,6 +177,25 @@ class oAuthBase
     {
         $curlopts = [
             CURLOPT_POST => $this->fieldCount,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_VERBOSE => false,
+            CURLOPT_RETURNTRANSFER => true
+        ];
+
+        return $curlopts;
+    }
+
+    /**
+     * Set the cUrl Options for a get request
+     *
+     * @return array
+     */
+    protected function setGetCurlopts()
+    {
+        $curlopts = [
+            CURLOPT_HTTPHEADER => $this->headers,
+            CURLOPT_POST => 0,
+            CURLOPT_HEADER => 0,
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_VERBOSE => false,
             CURLOPT_RETURNTRANSFER => true

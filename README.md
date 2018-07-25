@@ -55,12 +55,14 @@ are using the correct URIs, client ID and secret for your installation.
 
 ```
 # Current System Info
-MP_API_ENDPOINT="https://my.mychurch.org/ministryplatformapi"
-MP_OAUTH_DISCOVERY_ENDPOINT="https://my.mychurch.org/ministryplatform/oauth"
-MP_CLIENT_ID="myclientID"
-MP_CLIENT_SECRET="3053ec5d-my-secret-eae9"
-
+MP_API_ENDPOINT="https://connect.example.com/ministryplatformapi"
+MP_OAUTH_DISCOVERY_ENDPOINT="https://connect.example.com/ministryplatform/oauth"
 MP_API_SCOPE="http://www.thinkministry.com/dataplatform/scopes/all"
+
+# Data from Ministry Platform API Client
+MP_CLIENT_ID="mygccpco"
+MP_CLIENT_SECRET="4064ec5d-f9e6-secret-code-89406642abc7"
+MP_OAUTH_REDIRECT_URL="https://example1.com/oAuth"
 ```
 
 ### Loading the API Wrapper
@@ -82,24 +84,26 @@ $dotenv->load();
 ```  
 
 ## Usage
-Usage is straight forward.  Authenticate and execute your request.
+Usage is straight forward for client credentials flow.  Authenticate and execute your request.  
+NOTE: if you are using Laravel and Authorization Code flow, check the laravel documentation 
+in the documentation folder for a working code example.  
 ### Authentication
-Assuming your .env parameters are correct, this will authenticate your code 
+Assuming your .env parameters are correct, this will authenticate your code.  
 
 ```php
 // For the Table API enpoints 
 $mp = new MP();
-$mp->authenticate();
+$mp->authenticate();    
 
 // For the Procedures API endpoint
 $proc = new PROC();
-$proc->authenticate();
+$mp->authenticate();
 ```
 
 ### Execute select query
 The API Wrapper uses the same syntax as the swagger page. You can define the table, the select statement, filter and 
-orderBy clauses. This will return an array of events and then dump them to the screen.  Note that the data uses the familiar MP brand
-of SQL which is consistent with the platform.  
+orderBy clauses. This will return an array of events and then dump them to the screen.  Note that the data uses 
+the familiar MP brand of SQL which is consistent with the platform.  
 
 ```php
 // Get all Approved events happening in the next 30 days that are not cancelled and order by the Event Start Date

@@ -1,13 +1,35 @@
 <?php namespace MinistryPlatformAPI\OAuth;
 
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Session;
 
 class oAuthAuthorizationCode extends oAuthBase
 {
+    /**
+     * oAuth Token Request Results
+     *
+     * @var null
+     */
+    public $credentials = null;
 
+    /**
+     * oAuthAuthorizationCode constructor.
+     */
     public function __construct()
     {
+        // Get IDs and secrets, etc. for authorization
         $this->getCongfigParameters();
+
+        // Check the session for existing credentials
+        if (Session::has('creds') ){
+            $creds = Session::get('creds');
+            $this->credentials = unserialize($creds);
+
+            // If credentials expired, erase them to force a new credential request
+            if (! $this->credentials->isValidToken()){
+                $this->credentials = null;
+            }
+        }
     }
 
     /**
@@ -32,33 +54,59 @@ class oAuthAuthorizationCode extends oAuthBase
      * Use the Authorization Code to get an Access Token
      *
      * @param $code
-     * @return bool
+     * @return oAuthAuthorizationCode
      */
     public function acquireAccessToken($code)
     {
-        // Get the Discovery URI
-        if (!$this->endpointDiscovery()) return false;
+        if (! $this->credentials) {
 
-        // Request the token
+            $this->credentials = new Credentials('authorization_code');
+
+            // Get API endpoints
+            $this->endpointDiscovery();
+
+            // Acquire the tokens and expiration and save
+            $body = $this->acquireToken($code);
+            $this->credentials->set($body);
+
+            // Get user Info
+            $userInfo = $this->acquireUserInfo();
+            $this->credentials->set('userInfo', $userInfo);
+
+            // Add credentials to the session
+            $creds = serialize($this->credentials);
+            Session::put('creds', $creds);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get user info from the OAuth server
+     */
+    public function acquireUserInfo()
+    {
+        // Request the userinfo
         $client = new Client(); //GuzzleHttp\Client
 
+        $this->buildHttpHeader();
+        $endpoint = $this->userinfo_endpoint;
+
         try {
-            $response = $client->post($this->token_endpoint, [
-                'form_params' => $this->getAccessTokenFields($code),
-                'curl' => $this->setOauthCurlopts(),
+            $response = $client->request('GET', $endpoint, [
+                'header' => $this->headers,
+                'curl' => $this->setGetCurlopts(),
             ]);
 
             // Get the token and type from the response
             // $this->parseTokenResponse($response);
-            $body = json_decode($response->getBody(), true);
+            return json_decode($response->getBody(), true);
 
-        } catch (GuzzleException $e) {
+        } catch (\GuzzleException $e) {
 
             return false;
         }
-        return body;
     }
-
 
     /**
      * Field list for Access Token Request
@@ -80,7 +128,6 @@ class oAuthAuthorizationCode extends oAuthBase
         return $this->oAuthFields;
     }
 
-
     /**
      * Erase the credentials
      *
@@ -97,47 +144,38 @@ class oAuthAuthorizationCode extends oAuthBase
         return true;
     }
 
-
     /**
      * Get a new Access token
      *
      * @return bool
      */
-    private function getToken()
+    private function acquireToken($code)
     {
         // Request the token
         $client = new Client(); //GuzzleHttp\Client
 
         try {
             $response = $client->post($this->token_endpoint, [
-                'form_params' => $this->getOauthFields(),
+                'form_params' => $this->getAccessTokenFields($code),
                 'curl' => $this->setOauthCurlopts(),
             ]);
 
             // Get the token and type from the response
-            $this->parseTokenResponse($response);
+            return json_decode($response->getBody(), true);
 
-        } catch (GuzzleException $e) {
+        } catch (\GuzzleException $e) {
 
             return false;
         }
-
-        return true;
     }
 
-
-
-    /**
-     * Get tokens from authentication attempt
-     *
-     * @param $response
-     */
-    private function parseTokenResponse($response)
+    protected function buildHttpHeader()
     {
-        $body = json_decode($response->getBody(), true);
-
-        $this->credentials->save($body);
+        // Set the header
+        $auth = 'Authorization: ' . $this->credentials->getAccessToken();
+        $scope = 'Scope: ' . $this->scope;
+        $this->headers =  ['Accept: application/json', 'Content-type: application/json', $auth, $scope];
+        return $this->headers;
 
     }
-
 }

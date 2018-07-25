@@ -66,6 +66,8 @@ class MinistryPlatformProcAPI extends MinistryPlatformBaseAPI
         $auth = 'Authorization: ' . $this->authorization->credentials->getAccessToken();
         $scope = 'Scope: ' . $this->authorization->scope;
         $this->headers = ['Accept: application/json', 'Content-type: application/json', $auth, $scope];
+
+        return $this->headers;
     }
 
     /**

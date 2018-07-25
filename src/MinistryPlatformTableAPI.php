@@ -393,7 +393,6 @@ class MinistryPlatformTableAPI extends MinistryPlatformBaseAPI
         return $results;
     }
 
-
     /**
      * Construct the API Endpoint for the request
      *

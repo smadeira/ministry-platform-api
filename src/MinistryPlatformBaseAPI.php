@@ -1,6 +1,7 @@
 <?php namespace MinistryPlatformAPI;
 
 use GuzzleHttp\Client;
+use MinistryPlatformAPI\OAuth\oAuthAuthorizationCode;
 use MinistryPlatformAPI\OAuth\oAuthClientCredentials;
 
 abstract class MinistryPlatformBaseAPI
@@ -44,8 +45,17 @@ abstract class MinistryPlatformBaseAPI
      */
     public function authenticate($grantType = 'client_credentials')
     {
-        $cc = new oAuthClientCredentials;
-        $this->authorization = $cc->clientCredentials();
+        if ($grantType == 'client_credentials') {
+            $cc = new oAuthClientCredentials;
+            $this->authorization = $cc->clientCredentials();
+        } elseif ($grantType = 'authorization_code') {
+            // Authentication has already taken place so we just need an instance of authCode
+            // that has the necessary credentials
+            $this->authorization = new oAuthAuthorizationCode();
+        } else {
+            // Unknown grant type
+            return false;
+        }
 
         return $this;
     }
