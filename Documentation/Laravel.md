@@ -76,6 +76,10 @@ Each route that is protected by the authorization code flow will need to indicat
 // Routes related to oAuth Authorization_Code grants
 // This example creates a route named welcome.login and ties it to the auth.code middleware
 Route::get('/myapp', ['middleware' => 'auth.code', 'uses' =>'WelcomeController@myApp'])->name('welcome.login');
+
+// This route is for the callbak URI.  The method is never actually called because the Middleware intercepts
+// it and processes it. This URI should match the URI configured in the MP API Client.
+Route::get('/oAuth', ['middleware' => 'auth.code', 'uses' =>'WelcomeController@oAuth']);
 ```
 ### Sample Usage
 ```php
