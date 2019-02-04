@@ -5,6 +5,7 @@ use Illuminate\Cache\CacheManager;
 use Illuminate\Container\Container;
 use Illuminate\Filesystem\Filesystem;
 
+use Illuminate\Support\Facades\Log;
 
 class oAuthClientCredentials extends oAuthBase
 {
@@ -23,8 +24,20 @@ class oAuthClientCredentials extends oAuthBase
     private $cache = null;
 
 
+    /**
+     * Name for the cached credentials we want to use
+     * @var null
+     */
+    protected $cacheKey = null;
+
+
     public function __construct()
     {
+        // Set the account name from configuration, if available
+        $this->accountName = getenv('MP_ACCOUNT_NAME', 'www');
+
+        $this->cacheKey = $this->accountName . '-oAuthCredentials';
+
         // Get endpoint
         $this->getCongfigParameters();
 
@@ -32,8 +45,8 @@ class oAuthClientCredentials extends oAuthBase
         $this->cache = $this->initCache();
 
         // Get credentials if they are in the cache
-        if ($this->cache->has('creds') ){
-            $creds = $this->cache->get('creds');
+        if ($this->cache->has($this->cacheKey) ){
+            $creds = $this->cache->get($this->cacheKey);
             $this->credentials = unserialize($creds);
         }
     }
@@ -58,7 +71,7 @@ class oAuthClientCredentials extends oAuthBase
             // Add credentials to the cache
             $creds = serialize($this->credentials);
             $expiration = $this->credentials->getExpiration();
-            $this->cache->put('creds', $creds, $expiration );
+            $this->cache->put($this->cacheKey, $creds, $expiration );
         }
 
         return $this;

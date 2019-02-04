@@ -85,6 +85,13 @@ class oAuthBase
     protected $headers = null;
 
     /**
+     * for caching of credentials in multi-tenant system.
+     * Set this to an account name (mygcc, for example) to 
+     * differentiate the different accounts using the system
+     */
+    protected $accountName = 'www';
+
+    /**
      * Query discovery endpoint for available resources and capabilities
      * @return $this|bool
      */
@@ -147,6 +154,7 @@ class oAuthBase
         $this->mpClientSecret = getenv('MP_CLIENT_SECRET', null);
         $this->scope = getenv('MP_API_SCOPE', null);
         $this->mpRedirectURL = getenv('MP_OAUTH_REDIRECT_URL', null);
+
     }
 
 

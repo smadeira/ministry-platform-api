@@ -127,7 +127,10 @@ class Credentials
      */
     public function getExpiration($units = 'minutes')
     {
-        return $units == 'minutes' ? $this->expires_in / 60 : $this->expires_in;
+        $minutes = $units == 'minutes' ? $this->expires_in / 60 : $this->expires_in;
+        // $minutes = 1;
+        
+        return $minutes;
     }
 
     /**
