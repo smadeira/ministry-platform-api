@@ -1,5 +1,10 @@
 # Changelog for Ministry Platform API Wrapper
 
+## 2.3.0 (2019-02-06)
+- Fixed a timing issue in client credentials authentication.  Made the getToken request 
+synchronous to ensure it compeletes before calling the API.
+
+
 ## 2.3.0 (2018-07-25)
 - Restructured code to handle multiple grant types (authorization_code and client_credentials.)
 
