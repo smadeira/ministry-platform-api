@@ -158,6 +158,7 @@ class oAuthAuthorizationCode extends oAuthBase
             $response = $client->post($this->token_endpoint, [
                 'form_params' => $this->getAccessTokenFields($code),
                 'curl' => $this->setOauthCurlopts(),
+                'synchronous' => true,
             ]);
 
             // Get the token and type from the response
