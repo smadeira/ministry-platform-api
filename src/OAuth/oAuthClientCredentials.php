@@ -106,6 +106,7 @@ class oAuthClientCredentials extends oAuthBase
             $response = $client->post($this->token_endpoint, [
                 'form_params' => $this->getOauthFields(),
                 'curl' => $this->setOauthCurlopts(),
+                'synchronous' => true,
             ]);
 
             // Get the token and type from the response
