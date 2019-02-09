@@ -125,7 +125,8 @@ Here is a whole script that gets events in the next 30 days.
 
 require_once __DIR__ . '/vendor/autoload.php';
 
-use MinistryPlatformAPI\MinistryPlatformAPI as MP;
+use MinistryPlatformAPI\MinistryPlatformTableAPI as MP;
+
 
 // Get environment variables
 $dotenv = new Dotenv\Dotenv(__DIR__);

@@ -93,13 +93,13 @@ class WelcomeController extends Controller
 {
     public function myApp(authCode $ac, Request $request)
     {
-        // Define the MP Security Role required to execute this method 
+        // Define the MP Security Role required to execute this method
         $role = 'Administrators';
 
         // For the authorization code flow, user info is available and
         // is stored in the authCode object.
         $user = $ac->credentials->getUserInfo();
-        
+
         // Security roles are an array in user info
         $roles = $user['roles'];
 
@@ -110,7 +110,7 @@ class WelcomeController extends Controller
         // Check if the user has the appropriate role for this request
         if (in_array($role, $roles)) {
 
-            // Authenticate and specify authorization_code flow.  If no 
+            // Authenticate and specify authorization_code flow.  If no
             // parameter is supplied, it will default to 'client_credentials'
             $mp = MP::authenticate('authorization_code');
 
