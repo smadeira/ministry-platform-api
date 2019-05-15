@@ -1,5 +1,19 @@
 # Changelog for Ministry Platform API Wrapper
 
+## 2.3.4 (2019-05-15)
+- Added deleteMultiple() method to allow deleting muiltiple records in one API call
+
+Example usage:
+
+```php
+// IDs are Event_Participant_IDs (primary Key)
+$rec = ['IDs' => [309599,309598] ];
+
+$ep = $mp->table('Event_Participants')
+             ->records($rec)
+             ->deleteMultiple();
+```
+
 ## 2.3.3 (2019-02-06)
 - Fixed a timing issue in client credentials and authorization code authentication.  Made the getToken request 
 synchronous to ensure it compeletes before calling the API.
@@ -26,7 +40,7 @@ the table name, the id and the optional select list.
                   ->record(67102)
                   ->getSingle();
 
-
+```
 
 ## 2.2.10 (2018-07-01)
 

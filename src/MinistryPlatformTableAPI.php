@@ -333,6 +333,46 @@ class MinistryPlatformTableAPI extends MinistryPlatformBaseAPI
     }
 
     /**
+     * Delete multiple records with the supplied IDs
+     *
+     */
+    public function deleteMultiple()
+    {
+        // Set the endpoint
+        $endpoint = $this->buildEndpoint();
+
+        $endpoint .= 'delete';
+
+        // Set the header
+        $this->buildHttpHeader();
+
+        // Send the request
+        $client = new Client(); //GuzzleHttp\Client
+
+        try {
+
+            $response = $client->request('POST', $endpoint, [
+                'headers' => $this->headers,
+                'body' => $this->postFields,
+                'curl' => $this->setPostCurlopts(),
+            ]);
+
+        } catch (\GuzzleException $e) {
+            $this->errorMessage = $e->getResponse()->getBody()->getContents();
+            return false;
+
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            $this->errorMessage = $e->getResponse()->getBody()->getContents();
+            return false;
+        } catch (\GuzzleHttp\Exception\ServerException $e) {
+            $this->errorMessage = $e->getResponse()->getBody()->getContents();
+            return false;
+        }
+
+        return $results = json_decode($response->getBody(), true);
+    }
+
+    /**
      * Request data 1000 rows at a time until all data has been retrieved
      * The JSON API returns a max of 1000 records per request.  Use
      * the $skip to move the results window 1000 records at a time.

@@ -184,13 +184,27 @@ not the whole record(s), you can specify those fields in the select() method.  E
 returning the results of a GET all in one operation.  
 
 ### Deleting Records
+Warning: Deleting can do really bad things to your database.  Test in the sandbox! Use at your own risk.  Once it's gone, it's gone.
+
 Existing table rows can be deleted by calling the delete method and passing the id of the row to delete.  For example, to delete the contact with 
 contact_id of 24599, execute this command:
 
 ```phpo
 $contact = $mp->table('Contacts')->delete(24599);
 ```
-As of now, delete only works with single record deletes.  The multiple record delete has not been implemented.
+
+### Deleting Multiple Records
+Existing rows can be deleted in mass with the deleteMultiple() method
+
+```php
+// IDs are Event_Participant_IDs (primary Key)
+$rec = ['IDs' => [309599,309598] ];
+
+$ep = $mp->table('Event_Participants')
+             ->records($rec)
+             ->deleteMultiple();
+```
+
 
 ### Executing Procedures
 Procedures can be executed using the Procedures API endpoint.  This example gets the selected contacts using a custom procedure written for our PCO integration.
