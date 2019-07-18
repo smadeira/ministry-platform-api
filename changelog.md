@@ -1,5 +1,8 @@
 # Changelog for Ministry Platform API Wrapper
 
+## 3.0.1 (2019-07-17)
+- Changed vlucas/phpdotenv to version 3 to be compatible with Laravel 5.8 and other packages that need dotenv 3.
+
 ## 2.3.4 (2019-05-15)
 - Added deleteMultiple() method to allow deleting muiltiple records in one API call
 

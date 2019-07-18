@@ -1,7 +1,7 @@
 ## Ministry Platform API Wrapper
 
 
-### Note for v2: This API wrapper has been updated to work with the new Ministry Platform oAuth changes (Spring 2018)
+### Note for v3: This API wrapper has been updated to work with dotenv version 3.0 (July 2019) and the new Ministry Platform oAuth changes (Spring 2018)
 
 A PHP wrapper to access the Ministry Platform (MP) REST API.  This version is updated to
 include the new changes to oAuth authentication rolling out in early 2018. Note that using the API implies a knowledge of the 
@@ -29,7 +29,7 @@ Or, you can edit your composer.json file directly to add the Ministry Platform A
 ```
 "require": {
         "php": ">=7.0.0",
-        "smadeira/ministry-platform-api": "^2"
+        "smadeira/ministry-platform-api": "^3"
     },
 ```
 
@@ -78,7 +78,7 @@ use MinistryPlatformAPI\MinistryPlatformTableAPI as MP;
 use MinistryPlatformAPI\MinistryPlatformProcAPI as PROC;
 
 // Get environment variables
-$dotenv = new Dotenv\Dotenv(__DIR__);
+$dotenv = Dotenv\Dotenv::create(__DIR__);
 $dotenv->load();
 
 ```  
@@ -129,7 +129,7 @@ use MinistryPlatformAPI\MinistryPlatformTableAPI as MP;
 
 
 // Get environment variables
-$dotenv = new Dotenv\Dotenv(__DIR__);
+$dotenv = Dotenv\Dotenv::create(__DIR__);
 $dotenv->load();
 
 
@@ -189,7 +189,7 @@ Warning: Deleting can do really bad things to your database.  Test in the sandbo
 Existing table rows can be deleted by calling the delete method and passing the id of the row to delete.  For example, to delete the contact with 
 contact_id of 24599, execute this command:
 
-```phpo
+```php
 $contact = $mp->table('Contacts')->delete(24599);
 ```
 
@@ -216,7 +216,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 use MinistryPlatformAPI\MinistryPlatformProcAPI as PROC;
 
 // Get environment variables
-$dotenv = new Dotenv\Dotenv(__DIR__);
+$dotenv = Dotenv\Dotenv::create(__DIR__);
 $dotenv->load();
 
 
