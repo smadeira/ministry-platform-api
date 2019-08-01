@@ -167,6 +167,17 @@ class MinistryPlatformTableAPI extends MinistryPlatformBaseAPI
     }
 
     /**
+     * Set the Skip parameter for the GET Request
+     * @param $skip | integer
+     * @return $this
+     */
+    public function skip($skip){
+        $this->skip = $skip;
+
+        return $this;
+    }
+    
+    /**
      * Set the Distinct attribute for the query
      * @param $distinct
      * @return $this
