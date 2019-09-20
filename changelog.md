@@ -1,5 +1,17 @@
 # Changelog for Ministry Platform API Wrapper
 
+## 3.0.2 (2019-09-20)
+- Added skip() method to allow manual pagination.  Usage could look like this to get 20 rows starting with the 40th record.
+```php
+$rowsToSkip = 40;
+$contacts = $mp->table('Contacts')
+        ->select("Contacts.Contact_ID, Household_ID, First_Name, Middle_Name, Last_Name, Display_Name, Gender_ID_Table.[Gender], Nickname")        
+        ->top(20)
+        ->skip($rowsToSkip)
+        ->get();
+```
+You can increment $rowsToSkip and make the next request.
+
 ## 3.0.1 (2019-07-17)
 - Changed vlucas/phpdotenv to version 3 to be compatible with Laravel 5.8 and other packages that need dotenv 3.
 
