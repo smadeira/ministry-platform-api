@@ -1,5 +1,8 @@
 # Changelog for Ministry Platform API Wrapper
 
+## 3.0.3 (2019-10-04)
+- Updated composer.json to utilize Illuminte 5.x OR 6.x to support Laravel 6.x
+
 ## 3.0.2 (2019-09-20)
 - Added skip() method to allow manual pagination.  Usage could look like this to get 20 rows starting with the 40th record.
 ```php

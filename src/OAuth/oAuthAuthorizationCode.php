@@ -76,6 +76,10 @@ class oAuthAuthorizationCode extends oAuthBase
             // Add credentials to the session
             $creds = serialize($this->credentials);
             Session::put('creds', $creds);
+            
+            // Add user info to the session
+            // Session::put('userInfo', $userInfo);
+            
         }
 
         return $this;
