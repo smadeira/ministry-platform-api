@@ -232,3 +232,60 @@ $contacts = $mp->proc('api_MYGCC_PCOGetSelectedContacts')
 
 print_r($contacts);
 ```
+
+### Files Endpoints
+The API wrapper now supports the files API operations. 
+
+### Listing Files For A Record
+Provide the table name and the record_id to get information about each file
+```// Get metadata for the file(s) based on table and record id
+   $fm = $mp->table('Contacts')->recordID(55309)->get();
+   $metadata = json_decode($fm, true);
+print_r($metadata);
+```
+### Downloading Files for a Record
+Using the FileId or the UniqueFileId, you can download the file.  The API returns the file as a stream that you can 
+save to a local file.
+```
+// Get metadata for the file(s) based on table and record id
+$fm = $mp->table('Contacts')->recordID(55309)->get();
+$metadata = json_decode($fm, true);
+
+// Loop through the metadata and retrieve each file
+foreach ($metadata as $fileData) {
+
+	echo 'Saving file: ' . $fileData['FileName'] . "\n";
+	$fileID = $fileData['FileId'];
+
+	$file = $mp->fileID($fileID)->get();
+	$outfile = 'D:/Temp/' . $fileData['FileName'];
+
+	file_put_contents($outfile, $file);
+}
+``` 
+### Uploading A File
+You can upload a file and metadata to a table/record.  This example includes some extra attributes.
+```
+$filename = 'D:/Pictures/Profile_Picture.jpg';
+
+$response = $mp->table('Contacts')
+            ->recordID(55309)
+            ->file($filename)
+            ->default()
+            ->longestDimension(300)
+            ->description('New Picture 2020')
+            ->post();
+```
+
+### Modify A File
+You can modify an existing file (including swapping out the image)
+```
+$file = $mp->fileId(63793)
+              ->description('Second Picture From 2019')
+              ->put();
+```
+### Delete a File
+Pass in the FileID of the file and delete it
+```
+$result = $mp->delete(63792);
+```
