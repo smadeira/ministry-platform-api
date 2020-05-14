@@ -1,6 +1,8 @@
 <?php namespace MinistryPlatformAPI;
 
-class MinistryPlatformProcFacade extends \Illuminate\Support\Facades\Facade
+use Illuminate\Support\Facades\Facade;
+
+class MinistryPlatformProcFacade extends Facade
 {
     /**
      * {@inheritDoc}

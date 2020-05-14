@@ -2,13 +2,13 @@
 
 use Illuminate\Support\Facades\Facade;
 
-class MinistryPlatformTableFacade extends Facade
+class MinistryPlatformFileFacade extends Facade
 {
     /**
      * {@inheritDoc}
      */
     protected static function getFacadeAccessor()
     {
-        return MinistryPlatformTableAPI::class;
+        return MinistryPlatformFileAPI::class;
     }
 }
