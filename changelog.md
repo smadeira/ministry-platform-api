@@ -1,6 +1,6 @@
 # Changelog for Ministry Platform API Wrapper
 
-## 3.1.0 (2020-05-13)
+## 3.1.0 (2020-05-14)
 - Updated composer.json to utilize Illuminate 5.x, 6.x or 7.x to support Laravel 7.x
 - Added support for the /files API endpoints - full CRUD.  See Readme for some examples and the code
 for deatils.
