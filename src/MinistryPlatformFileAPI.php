@@ -93,6 +93,7 @@ class MinistryPlatformFileAPI extends MinistryPlatformBaseAPI
     
     /**
      * Fields to return on put or post, I think
+     *
      * @var string
      */
     protected $select = "*";
@@ -238,6 +239,7 @@ class MinistryPlatformFileAPI extends MinistryPlatformBaseAPI
     
     /**
      * Set the select field list
+     *
      * @param $select
      *
      * @return $this
@@ -248,7 +250,6 @@ class MinistryPlatformFileAPI extends MinistryPlatformBaseAPI
         
         return $this;
     }
-    
     
     /**
      * Get requested files using pre-defined attributes
@@ -341,7 +342,7 @@ class MinistryPlatformFileAPI extends MinistryPlatformBaseAPI
         $auth = 'Authorization: ' . $this->authorization->credentials->getAccessToken();
         $scope = 'Scope: ' . $this->authorization->scope;
         
-        if ( $this->metadata) {
+        if ( $this->metadata ) {
             $accept = 'Accept: application/json';
         } else {
             $accept = 'Accept: image/jpeg';
@@ -367,7 +368,7 @@ class MinistryPlatformFileAPI extends MinistryPlatformBaseAPI
                 'headers' => $this->headers,
         ];
         
-        return  $this->sendData('POST', $parameters);
+        return $this->sendData('POST', $parameters);
     }
     
     /**
@@ -383,7 +384,7 @@ class MinistryPlatformFileAPI extends MinistryPlatformBaseAPI
         $parameters = [
                 'headers' => $this->headers,
                 'query' => ['$select' => $this->select],
-                'multipart' => $this->buildPostParameters()
+                'multipart' => $this->buildPostParameters(),
         ];
         
         $results = $this->sendData('PUT', $parameters);
@@ -397,7 +398,7 @@ class MinistryPlatformFileAPI extends MinistryPlatformBaseAPI
         $this->buildPostHttpHeader();
         
         // Generate the endpoint
-        $endpoint = $this->authorization->apiEndpoint . '/files/' .  $fileID;
+        $endpoint = $this->authorization->apiEndpoint . '/files/' . $fileID;
         
         // Send the request
         $client = new Client(); //GuzzleHttp\Client
@@ -428,6 +429,7 @@ class MinistryPlatformFileAPI extends MinistryPlatformBaseAPI
     
     /**
      * Headers for uploading a file
+     *
      * @return array|null
      */
     protected function buildPostHttpHeader()
@@ -435,7 +437,7 @@ class MinistryPlatformFileAPI extends MinistryPlatformBaseAPI
         // Set the header
         $this->headers = [
                 'Accept' => 'application/json',
-                'Authorization' => $this->authorization->credentials->getAccessToken()
+                'Authorization' => $this->authorization->credentials->getAccessToken(),
         ];
         
         return $this->headers;
@@ -536,6 +538,7 @@ class MinistryPlatformFileAPI extends MinistryPlatformBaseAPI
     
     /**
      * Dump the contents of the object for debugging purposes
+     *
      * @return $this
      */
     public function dump()
