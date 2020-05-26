@@ -234,14 +234,26 @@ print_r($contacts);
 ```
 
 ### Files Endpoints
-The API wrapper now supports the files API operations. 
+The API wrapper now supports the files API operations. To load the Files API wrapper, do something like this:
+
+```
+require_once __DIR__ . '/vendor/autoload.php';
+
+use MinistryPlatformAPI\MinistryPlatformFileAPI as MP;
+
+// Get environment variables
+$dotenv = Dotenv\Dotenv::create(__DIR__);
+$dotenv->load();
+```
+
 
 ### Listing Files For A Record
 Provide the table name and the record_id to get information about each file
-```// Get metadata for the file(s) based on table and record id
+```
+// Get metadata for the file(s) based on table and record id
    $fm = $mp->table('Contacts')->recordID(55309)->get();
    $metadata = json_decode($fm, true);
-print_r($metadata);
+   print_r($metadata);
 ```
 ### Downloading Files for a Record
 Using the FileId or the UniqueFileId, you can download the file.  The API returns the file as a stream that you can 
