@@ -1,5 +1,6 @@
 ## Ministry Platform API Wrapper
 
+### For dotenv 4.x support (including Laravel 7.x) you need to download v4.x of the API wrapper.
 
 ### Note for v3: This API wrapper has been updated to work with dotenv version 3.0 (July 2019) and the new Ministry Platform oAuth changes (Spring 2018)
 
