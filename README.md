@@ -1,7 +1,9 @@
 ## Ministry Platform API Wrapper
 
-### Note for v4: This API wrapper has been updated to work with phpdotenv version 4.x (July 2020) and Laravel 7.x.  For support of phpdotenv v3 or Laravel version 6, grab the 3.x version of the API wrapper. 
+#### Note for v4: This API wrapper has been updated to work with phpdotenv version 4.x (July 2020) and Laravel 7.x.  
+For support of phpdotenv v3 or Laravel version 6, grab the 3.x version of the API wrapper. 
 
+###Purpose
 A PHP wrapper to access the Ministry Platform (MP) REST API.  This version is updated to
 include the new changes to oAuth authentication rolling out in early 2018. Note that using the API implies a knowledge of the 
 MP data model. The API gives you access to each table in the database. It is up to you to pull the right data (or POST the right data) 
