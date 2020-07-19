@@ -1,5 +1,8 @@
 # Changelog for Ministry Platform API Wrapper
 
+## 4.0.0 (2020-07-19)
+- Updated to use phpdotenv v4.x to work with Laravel 7.x.  If you need Laravel 6 or earlier support, use the latest version of the 3.x series.
+
 ## 3.1.0 (2020-05-14)
 - Added support for the /files API endpoints - full CRUD.  See Readme for some examples and the code
 for deatils.

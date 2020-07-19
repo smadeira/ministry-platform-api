@@ -12,10 +12,10 @@
     "require": {
         "php": ">=7.0.0",
         "guzzlehttp/guzzle": "~6.0",
-        "illuminate/cache": "5.x || 6.x || 7.x",
-        "illuminate/filesystem": "5.x || 6.x || 7.x",
-        "illuminate/container": "5.x || 6.x || 7.x",
-        "vlucas/phpdotenv": "^3.3"
+        "illuminate/cache": "7.x",
+        "illuminate/filesystem": "7.x",
+        "illuminate/container": "7.x",
+        "vlucas/phpdotenv": "4.x"
     },
     "minimum-stability": "dev",
     "autoload": {
