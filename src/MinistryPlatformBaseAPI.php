@@ -36,8 +36,7 @@ abstract class MinistryPlatformBaseAPI
      * @var
      */
     protected $headers;
-
-
+    
     /**
      * Authenticate to the API and get a token
      *
@@ -140,8 +139,8 @@ abstract class MinistryPlatformBaseAPI
 
         return $curlopts;
     }
-
-
+    
     abstract protected function buildEndpoint();
+    
     abstract protected function buildHttpHeader();
 }
