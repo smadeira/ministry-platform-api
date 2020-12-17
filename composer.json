@@ -6,11 +6,11 @@
     "authors": [
         {
             "name": "Scott Madeira",
-            "email": "smadeira@zoominternet.net"
+            "email": "scott@codeflaretech.com"
         }
     ],
     "require": {
-        "php": ">=7.0.0",
+        "php": ">=7.3.0",
         "guzzlehttp/guzzle": "~7.0",
         "illuminate/cache": "^8.0",
         "illuminate/filesystem": "^8.0",

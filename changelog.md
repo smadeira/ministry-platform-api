@@ -1,5 +1,13 @@
 # Changelog for Ministry Platform API Wrapper
 
+## 5.0.1 (2020-12-17)
+- Added compatibility for Laravel 8 with updated dependencies
+- Added requirement for php 7.3 or greater
+
+
+## 4.0.x (2020-08) 
+- Added compatibility for Laravel 7 with update dependencies
+
 ## 3.1.6 (2020-08-15)
 - Removed compatibility with Laravel 7 (required upgrade to phpdotenv 4.x) because it brok all backward compatibility.  Laravel 7 with new phpdotenv will be released as version 4.x.
 
