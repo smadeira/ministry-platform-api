@@ -67,10 +67,10 @@ abstract class MinistryPlatformBaseAPI
      * @return bool|mixed
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    protected function sendData($verb, $parameters)
+    protected function sendData($verb, $parameters, $endpoint = NULL)
     {
-        // Set the endpoint
-        $endpoint = $this->buildEndpoint();
+        // Set the endpoint if one not passed in
+        if (! $endpoint) $endpoint = $this->buildEndpoint();
 
         // Set the header
         $this->buildHttpHeader();

@@ -1,5 +1,30 @@
 # Changelog for Ministry Platform API Wrapper
 
+## 5.1.0 (2022-06-14)
+- Added support for userID and GlobalFilterId parameters
+- Added postGet() method on the Table API to execute a "GET" request using a POST verb. Supports the /tabe/{tablename}/get endpoint 
+in the MP API. Like the get() method, this will return all rows that meet the criteria which could be thousande of rows. Sample Code:
+
+```php  
+$idList = [385423, 385424];
+$sel = "Donation_Date, Donor_ID_Table_Contact_ID_Table.Display_Name, Donation_Amount, Payment_Type_ID_Table.[Payment_Type]";
+$filter = "Donation_Date > '2022-05-01' AND Donations.Payment_Type_ID <> 6 and Donations.Domain_ID = 1";
+
+$donations = $mp->table('Donations')
+  ->select($sel)
+  ->filter($filter)
+  ->orderBy('Donation_Amount')
+  ->ids($idList)
+  ->postGet(); 
+```
+- Updated README.md to reflect that the latest versions of phpdotenv have a different method for initialization. 
+To use getenv(), we need the createUnsafeImmutable() method because getenv() is not thread-safe. 
+ 
+```php
+// Get environment variables
+$dotenv = Dotenv\Dotenv::createUnsafeImmutable(__DIR__);
+$dotenv->load();
+```
 ## 5.0.1 (2020-12-17)
 - Added compatibility for Laravel 8 with updated dependencies
 - Added requirement for php 7.3 or greater

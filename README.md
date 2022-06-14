@@ -31,8 +31,8 @@ composer require smadeira/ministry-platform-api
 Or, you can edit your composer.json file directly to add the Ministry Platform API:
 ```
 "require": {
-        "php": ">=7.0.0",
-        "smadeira/ministry-platform-api": "^3"
+        "php": ">=8.0.0",
+        "smadeira/ministry-platform-api": "^5"
     },
 ```
 
@@ -63,7 +63,7 @@ MP_OAUTH_DISCOVERY_ENDPOINT="https://connect.example.com/ministryplatform/oauth"
 MP_API_SCOPE="http://www.thinkministry.com/dataplatform/scopes/all"
 
 # Data from Ministry Platform API Client
-MP_CLIENT_ID="mygccpco"
+MP_CLIENT_ID="churchapi"
 MP_CLIENT_SECRET="4064ec5d-f9e6-secret-code-89406642abc7"
 MP_OAUTH_REDIRECT_URL="https://example1.com/oAuth"
 ```
@@ -81,7 +81,7 @@ use MinistryPlatformAPI\MinistryPlatformTableAPI as MP;
 use MinistryPlatformAPI\MinistryPlatformProcAPI as PROC;
 
 // Get environment variables
-$dotenv = Dotenv\Dotenv::create(__DIR__);
+$dotenv = Dotenv\Dotenv::createUnsafeImmutable(__DIR__);
 $dotenv->load();
 
 ```  
@@ -132,7 +132,7 @@ use MinistryPlatformAPI\MinistryPlatformTableAPI as MP;
 
 
 // Get environment variables
-$dotenv = Dotenv\Dotenv::create(__DIR__);
+$dotenv = Dotenv\Dotenv::createUnsafeImmutable(__DIR__);
 $dotenv->load();
 
 
@@ -148,6 +148,22 @@ $events = $mp->table('Events')
 
 print_r($events);
 ```
+### Gets using POST
+If your GET query string is too long, you can do a GET using the POST verb to get around the length limitation. postGet() will return all rows that meets the
+criteria (could be thousands of rows.)
+```php  
+$idList = [385423, 385424];
+$sel = "Donation_Date, Donor_ID_Table_Contact_ID_Table.Display_Name, Donation_Amount, Payment_Type_ID_Table.[Payment_Type]";
+$filter = "Donation_Date > '2022-05-01' AND Donations.Payment_Type_ID <> 6 and Donations.Domain_ID = 1";
+
+$donations = $mp->table('Donations')
+  ->select($sel)
+  ->filter($filter)
+  ->orderBy('Donation_Amount')
+  ->ids($idList)
+  ->postGet(); 
+```
+
 
 ### POSTing new Records
 Data can be written to database via HTTP POST request. The new data is specified in the record and all required fields must be provided.
@@ -219,7 +235,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 use MinistryPlatformAPI\MinistryPlatformProcAPI as PROC;
 
 // Get environment variables
-$dotenv = Dotenv\Dotenv::create(__DIR__);
+$dotenv = Dotenv\Dotenv::createUnsafeImmutable(__DIR__);
 $dotenv->load();
 
 
@@ -239,20 +255,21 @@ print_r($contacts);
 ### Files Endpoints
 The API wrapper now supports the files API operations. To load the Files API wrapper, do something like this:
 
-```
+```php
 require_once __DIR__ . '/vendor/autoload.php';
 
 use MinistryPlatformAPI\MinistryPlatformFileAPI as MP;
 
 // Get environment variables
-$dotenv = Dotenv\Dotenv::create(__DIR__);
+$dotenv = Dotenv\Dotenv::createUnsafeImmutable(__DIR__);
 $dotenv->load();
 ```
 
 
 ### Listing Files For A Record
 Provide the table name and the record_id to get information about each file
-```
+```php
+
 // Get metadata for the file(s) based on table and record id
    $fm = $mp->table('Contacts')->recordID(55309)->get();
    $metadata = json_decode($fm, true);
@@ -261,7 +278,7 @@ Provide the table name and the record_id to get information about each file
 ### Downloading Files for a Record
 Using the FileId or the UniqueFileId, you can download the file.  The API returns the file as a stream that you can 
 save to a local file.
-```
+```php
 // Get metadata for the file(s) based on table and record id
 $fm = $mp->table('Contacts')->recordID(55309)->get();
 $metadata = json_decode($fm, true);
@@ -280,7 +297,7 @@ foreach ($metadata as $fileData) {
 ``` 
 ### Uploading A File
 You can upload a file and metadata to a table/record.  This example includes some extra attributes.
-```
+```php
 $filename = 'D:/Pictures/Profile_Picture.jpg';
 
 $response = $mp->table('Contacts')
@@ -294,13 +311,13 @@ $response = $mp->table('Contacts')
 
 ### Modify A File
 You can modify an existing file (including swapping out the image)
-```
+```php
 $file = $mp->fileId(63793)
               ->description('Second Picture From 2019')
               ->put();
 ```
 ### Delete a File
 Pass in the FileID of the file and delete it
-```
+```php
 $result = $mp->delete(63792);
 ```
