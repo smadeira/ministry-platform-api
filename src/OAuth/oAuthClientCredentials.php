@@ -34,7 +34,7 @@ class oAuthClientCredentials extends oAuthBase
     public function __construct()
     {
         // Set the account name from configuration, if available
-        $this->accountName = getenv('MP_ACCOUNT_NAME', 'www');
+        $this->accountName = config('mp-api-wrapper.MP_ACCOUNT_NAME');
 
         $this->cacheKey = $this->accountName . '-oAuthCredentials';
 
