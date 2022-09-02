@@ -26,8 +26,10 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
      * @return void
      */
     public function boot()
-    {
-        
+    {         
+        $this->publishes([
+            __DIR__.'/config/mp-api-wrapper.php' => config_path('mp-api-wrapper.php'),
+        ]);
     }
     
 }
