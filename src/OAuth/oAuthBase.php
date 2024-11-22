@@ -148,12 +148,12 @@ class oAuthBase
      */
     protected function getCongfigParameters()
     {
-        $this->apiEndpoint = getenv('MP_API_ENDPOINT', null);
-        $this->oAuthDiscoveryUrl = getenv('MP_OAUTH_DISCOVERY_ENDPOINT', null);
-        $this->mpClientId = getenv('MP_CLIENT_ID', null);
-        $this->mpClientSecret = getenv('MP_CLIENT_SECRET', null);
-        $this->scope = getenv('MP_API_SCOPE', null);
-        $this->mpRedirectURL = getenv('MP_OAUTH_REDIRECT_URL', null);
+        $this->apiEndpoint = config('mp-api-wrapper.MP_API_ENDPOINT');
+        $this->oAuthDiscoveryUrl = config('mp-api-wrapper.MP_OAUTH_DISCOVERY_ENDPOINT');
+        $this->mpClientId = config('mp-api-wrapper.MP_CLIENT_ID');
+        $this->mpClientSecret = config('mp-api-wrapper.MP_CLIENT_SECRET');
+        $this->scope = config('mp-api-wrapper.MP_API_SCOPE');
+        $this->mpRedirectURL = config('mp-api-wrapper.MP_OAUTH_REDIRECT_URL');
 
     }
 
